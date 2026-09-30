@@ -91,6 +91,28 @@ content:
     - name: morePlatformsLabel
       label: Tekst voor overige luisterplatforms
       type: string
+  - name: upcoming
+    label: Aankomende release
+    type: object
+    fields:
+    - name: eyebrow
+      label: Kleine tekst boven de kop
+      type: string
+    - name: title
+      label: Kop
+      type: string
+    - name: presaveLabel
+      label: Tekst pre-saveknop
+      type: string
+    - name: releasedLabel
+      label: Tekst luisterknop na release
+      type: string
+    - name: followNote
+      label: Toelichting Spotify-toestemming
+      type: text
+    - name: countdownLabel
+      label: Tekst achter countdown
+      type: string
   - name: links
     label: Sectie met sets en playlists
     type: object
@@ -272,6 +294,78 @@ content:
       description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
     - name: label
       label: Eigen tekst voor deze link (optioneel)
+      type: string
+  - name: upcomingReleases
+    label: Aankomende releases
+    type: object
+    list: true
+    description: Voeg een release één keer toe. Voor release toont de site de pre-save; na herkenning via ISRC schakelt hij automatisch naar Spotify.
+    fields:
+    - name: slug
+      label: URL-naam
+      type: string
+      description: Alleen kleine letters, cijfers en streepjes. Bijvoorbeeld push. De pagina wordt /presave/push/.
+      pattern:
+        regex: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+        message: Gebruik alleen kleine letters, cijfers en streepjes.
+    - name: title
+      label: Titel
+      type: string
+      required: true
+    - name: artist
+      label: Artiesten
+      type: string
+      required: true
+    - name: isrc
+      label: ISRC
+      type: string
+      description: Bijvoorbeeld NLABC2612345. Streepjes zijn toegestaan; de synchronisatie normaliseert de code.
+    - name: releaseDate
+      label: Releasedatum
+      type: date
+      required: true
+    - name: artwork
+      label: Artwork
+      type: image
+    - name: presaveUrl
+      label: Pre-save URL
+      type: string
+      description: De URL van je pre-saveprovider. Deze wordt achter de eigen No Sync pre-savepagina gebruikt.
+    - name: followArtist
+      label: Spotify follow vermelden
+      type: boolean
+      description: Zet dit alleen aan als je pre-saveprovider tijdens Spotify-autorisatie ook toestemming vraagt om No Sync te volgen.
+    - name: featured
+      label: Uitlichten op homepage
+      type: boolean
+    - name: visible
+      label: Zichtbaar
+      type: boolean
+    - name: status
+      label: Status
+      type: select
+      options:
+        values:
+        - upcoming
+        - released
+      description: Laat op upcoming staan. De ISRC-synchronisatie zet dit automatisch op released zodra de track op Spotify is gevonden.
+    - name: spotifyTrackId
+      label: Automatisch - Spotify Track ID
+      type: string
+    - name: spotifyUrl
+      label: Automatisch - Spotify URL
+      type: string
+    - name: spotifyArtwork
+      label: Automatisch - Spotify artwork
+      type: string
+    - name: spotifyTitle
+      label: Automatisch - Spotify titel
+      type: string
+    - name: spotifyArtist
+      label: Automatisch - Spotify artiesten
+      type: string
+    - name: spotifyReleaseDate
+      label: Automatisch - Spotify releasedatum
       type: string
   - name: releases
     label: Releases
