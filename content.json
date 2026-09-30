@@ -1,0 +1,253 @@
+{
+  "tagline": "DJ / PRODUCER",
+  "genres": "Bass House · Drum & Bass",
+  "heroImage": "media/artist.png",
+  "logo": "media/logo.png",
+  "socials": [
+    {
+      "type": "INSTAGRAM",
+      "url": "https://www.instagram.com/itsnosync/"
+    },
+    {
+      "type": "SPOTIFY",
+      "url": "https://open.spotify.com/artist/6jG0cf5NUIIkxydJ9zTa8B?si=2yxNck2eQZqap8iITbgNyA"
+    },
+    {
+      "type": "YOUTUBE",
+      "url": "https://www.youtube.com/@NOSYNCMUSIC"
+    },
+    {
+      "type": "TIKTOK",
+      "url": "https://www.tiktok.com/@nosyncmusic"
+    },
+    {
+      "type": "FACEBOOK",
+      "url": "https://www.facebook.com/itsnosync"
+    },
+    {
+      "type": "SOUNDCLOUD",
+      "url": "https://soundcloud.com/nosyncmusic"
+    },
+    {
+      "type": "TWITTER",
+      "url": "https://x.com/nosyncofficial"
+    }
+  ],
+  "releases": [
+    {
+      "title": "I Just Wanna Know",
+      "artist": "Urban Dolhar & No Sync",
+      "artwork": "media/i-just-wanna-know.jpg",
+      "featured": true,
+      "visible": true,
+      "badge": "OUT NOW",
+      "links": [
+        {
+          "type": "DEEZER",
+          "url": "https://www.deezer.com/track/4171210702"
+        },
+        {
+          "type": "YOUTUBE_MUSIC",
+          "url": "https://music.youtube.com/watch?v=eQ8nhqfIU6Y"
+        },
+        {
+          "type": "SPOTIFY",
+          "url": "https://open.spotify.com/track/6WVF8AZbC2zao69JmAoCC0"
+        },
+        {
+          "type": "APPLE_MUSIC",
+          "url": "https://music.apple.com/us/album/i-just-wanna-know/6793460982?i=6793461163"
+        },
+        {
+          "type": "AMAZON_MUSIC",
+          "url": "https://music.amazon.com/albums/B0H9Y735VJ?tag=fndcmpgns-20"
+        },
+        {
+          "type": "ANGHAMMI",
+          "url": "https://play.anghami.com/album/1095877207?refer=found"
+        },
+        {
+          "type": "BEATPORT",
+          "url": "https://www.beatport.com/release/i-just-wanna-know/7241031"
+        },
+        {
+          "type": "TIDAL",
+          "url": "https://tidal.com/album/545248714/u"
+        },
+        {
+          "type": "SOUNDCLOUD",
+          "url": "https://soundcloud.com/nosyncmusic/i-just-wanna-know-1?si=ebcef00a2de84284ae51f45fc6a99a41&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
+        }
+      ]
+    },
+    {
+      "title": "Hold Me Closer",
+      "artist": "James O'Hea & No Sync",
+      "artwork": "media/hold-me-closer.jpg",
+      "featured": false,
+      "visible": true,
+      "badge": "OUT NOW",
+      "links": [
+        {
+          "type": "DEEZER",
+          "url": "https://www.deezer.com/track/3705060742"
+        },
+        {
+          "type": "YOUTUBE_MUSIC",
+          "url": "https://music.youtube.com/watch?v=6r-vcivlil4"
+        },
+        {
+          "type": "SPOTIFY",
+          "url": "https://open.spotify.com/track/6goCWRnTdD8Kq38e3wadl9"
+        },
+        {
+          "type": "APPLE_MUSIC",
+          "url": "https://music.apple.com/us/album/hold-me-closer/1860396661?i=1860396662"
+        }
+      ]
+    },
+    {
+      "title": "Move (Your Body)",
+      "artist": "No Sync",
+      "artwork": "media/move-your-body.jpg",
+      "featured": false,
+      "visible": true,
+      "badge": "OUT NOW",
+      "links": [
+        {
+          "type": "DEEZER",
+          "url": "https://www.deezer.com/track/3552573131"
+        },
+        {
+          "type": "YOUTUBE_MUSIC",
+          "url": "https://music.youtube.com/watch?v=vFYP99jSspQ"
+        },
+        {
+          "type": "SPOTIFY",
+          "url": "https://open.spotify.com/track/2Q7TgJnTGANOjwGATDrGid"
+        },
+        {
+          "type": "APPLE_MUSIC",
+          "url": "https://music.apple.com/us/album/move-your-body/1839666700?i=1839666701"
+        }
+      ]
+    },
+    {
+      "title": "In Your Eyes",
+      "artist": "No Sync",
+      "artwork": "media/in-your-eyes.jpg",
+      "featured": false,
+      "visible": true,
+      "badge": "OUT NOW",
+      "links": [
+        {
+          "type": "DEEZER",
+          "url": "https://www.deezer.com/track/3396420181"
+        },
+        {
+          "type": "YOUTUBE_MUSIC",
+          "url": "https://music.youtube.com/watch?v=jG7Xbj0SW08"
+        },
+        {
+          "type": "SPOTIFY",
+          "url": "https://open.spotify.com/track/4AOXH0t98GS1uqVrP81UJX"
+        },
+        {
+          "type": "APPLE_MUSIC",
+          "url": "https://music.apple.com/us/album/in-your-eyes/1776408820?i=1776408821"
+        }
+      ]
+    },
+    {
+      "title": "Vuurballon - No Sync Remix",
+      "artist": "BREDDEX & No Sync",
+      "artwork": "media/vuurballon-no-sync-remix.jpg",
+      "featured": false,
+      "visible": true,
+      "badge": "OUT NOW",
+      "links": [
+        {
+          "type": "DEEZER",
+          "url": "https://www.deezer.com/track/3016783301"
+        },
+        {
+          "type": "YOUTUBE_MUSIC",
+          "url": "https://music.youtube.com/watch?v=ovNkrmIxSW4"
+        },
+        {
+          "type": "SPOTIFY",
+          "url": "https://open.spotify.com/track/6PsijSYRVHkhmtPLQZ9toJ"
+        },
+        {
+          "type": "APPLE_MUSIC",
+          "url": "https://music.apple.com/us/album/vuurballon-no-sync-remix/1770643314?i=1770643315"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "title": "Pitch your Release HERE!",
+      "url": "https://pitchplaylists.com/submit-public-page/6a84ba90c9c40e3c46b98167",
+      "image": "media/link-1.png",
+      "subtitle": "Submit your music for playlist consideration",
+      "visible": true
+    },
+    {
+      "title": "No Sync - Stookhoksessies #452",
+      "url": "https://on.soundcloud.com/iCJ76i5EbnoTITB7kY",
+      "image": "media/link-2.jpeg",
+      "subtitle": "Full DJ set",
+      "visible": true
+    },
+    {
+      "title": "AFTERHOURS 🔥 Bass House & Tech",
+      "url": "https://open.spotify.com/playlist/4mn0Oxq9E6ewMXWpRuNkmw?si=f2465a4502064b3b",
+      "image": "media/link-3.png",
+      "subtitle": "Curated by No Sync",
+      "visible": true
+    },
+    {
+      "title": "Megisto feat. Myke Tyler - All I Need Is You (No Sync Remix)",
+      "url": "https://soundcloud.com/nosyncmusic/megisto-feat-myke-tyler-all-i?si=20c73729144942f1becafabe64c7b2bc&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
+      "image": "media/link-4.png",
+      "subtitle": "Free download",
+      "visible": true
+    }
+  ],
+  "shows": [
+    {
+      "date": "2026-10-21",
+      "title": "No Sync live",
+      "venue": "TBA",
+      "location": "Amsterdam, NL",
+      "ticketUrl": "",
+      "soldOut": false,
+      "visible": true
+    }
+  ],
+  "bandsintown": "https://www.bandsintown.com/a/15598110-no-sync",
+  "presskit": "https://www.dropbox.com/scl/fo/finst4jvknujybkqanqt7/ADovADNaUHs3ETtZ529AyeE?rlkey=0q7bg17sqs5t1dg1ba6v7e5a1",
+  "contacts": [
+    {
+      "label": "Bookings",
+      "email": "bookings@nosyncmusic.com",
+      "note": ""
+    },
+    {
+      "label": "Management",
+      "email": "tom@nosyncmusic.com",
+      "note": ""
+    },
+    {
+      "label": "Demos",
+      "email": "demo@nosyncmusic.com",
+      "note": "SoundCloud, Demmo or Dropbox links only."
+    },
+    {
+      "label": "General",
+      "email": "info@nosyncmusic.com",
+      "note": ""
+    }
+  ]
+}

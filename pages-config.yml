@@ -1,0 +1,153 @@
+media:
+  input: media
+  output: media
+content:
+- name: homepage
+  label: No Sync website
+  type: file
+  path: content.json
+  format: json
+  fields:
+  - name: tagline
+    label: Ondertitel
+    type: string
+  - name: genres
+    label: Genres
+    type: string
+  - name: heroImage
+    label: Artiestenfoto
+    type: image
+  - name: logo
+    label: Logo
+    type: image
+  - name: socials
+    label: Socials
+    type: object
+    list: true
+    fields:
+    - name: type
+      label: Platform
+      type: select
+      options:
+        values:
+        - INSTAGRAM
+        - SPOTIFY
+        - YOUTUBE
+        - TIKTOK
+        - FACEBOOK
+        - SOUNDCLOUD
+        - TWITTER
+    - name: url
+      label: Link
+      type: string
+  - name: releases
+    label: Releases
+    type: object
+    list: true
+    fields:
+    - name: title
+      label: Titel
+      type: string
+    - name: artist
+      label: Artiesten
+      type: string
+    - name: artwork
+      label: Artwork
+      type: image
+    - name: featured
+      label: Uitgelichte release
+      type: boolean
+    - name: badge
+      label: Label boven titel
+      type: string
+    - name: visible
+      label: Zichtbaar
+      type: boolean
+    - name: links
+      label: Luisterlinks
+      type: object
+      list: true
+      fields:
+      - name: type
+        label: Platform
+        type: select
+        options:
+          values:
+          - SPOTIFY
+          - APPLE_MUSIC
+          - YOUTUBE_MUSIC
+          - DEEZER
+          - BEATPORT
+          - SOUNDCLOUD
+          - AMAZON_MUSIC
+          - ANGHAMMI
+          - TIDAL
+      - name: url
+        label: Link
+        type: string
+  - name: links
+    label: Sets, playlists en overige links
+    type: object
+    list: true
+    fields:
+    - name: title
+      label: Titel
+      type: string
+    - name: subtitle
+      label: Ondertitel
+      type: string
+    - name: url
+      label: Link
+      type: string
+    - name: image
+      label: Afbeelding
+      type: image
+    - name: visible
+      label: Zichtbaar
+      type: boolean
+  - name: shows
+    label: Shows
+    type: object
+    list: true
+    fields:
+    - name: date
+      label: Datum (JJJJ-MM-DD)
+      type: string
+    - name: title
+      label: Evenement
+      type: string
+    - name: venue
+      label: Venue
+      type: string
+    - name: location
+      label: Locatie
+      type: string
+    - name: ticketUrl
+      label: Ticketlink (leeg als nog onbekend)
+      type: string
+    - name: soldOut
+      label: Uitverkocht
+      type: boolean
+    - name: visible
+      label: Zichtbaar
+      type: boolean
+  - name: bandsintown
+    label: Bandsintown-link
+    type: string
+  - name: presskit
+    label: Presskit-link
+    type: string
+  - name: contacts
+    label: Contactgegevens
+    type: object
+    list: true
+    fields:
+    - name: label
+      label: Categorie
+      type: string
+    - name: email
+      label: E-mailadres
+      type: string
+    - name: note
+      label: Toelichting
+      type: text
