@@ -219,7 +219,7 @@
       "location": "Amsterdam, NL",
       "ticketUrl": "https://shop.celebratix.io/?c=2g5sx",
       "soldOut": false,
-      "visible": true
+      "visible": false
     }
   ],
   "bandsintown": "https://www.bandsintown.com/a/15598110-no-sync",
