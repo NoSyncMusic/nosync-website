@@ -224,8 +224,59 @@
     byId(id).hidden = !url;
     if (url) byId(id).href = url;
   }
+
+  function daysUntil(value) {
+    const date = validDate(value);
+    if (!date) return null;
+    const today = validDate(todayInAmsterdam());
+    return Math.max(0, Math.ceil((date.getTime() - today.getTime()) / 86400000));
+  }
+  function releaseSlug(release) {
+    return words(release.slug).trim() || words(release.title).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  function releasePageUrl(release) {
+    const slug = releaseSlug(release);
+    return slug ? `presave/?release=${encodeURIComponent(slug)}` : '#';
+  }
+  function renderUpcoming(content, settings) {
+    const section = byId('upcoming');
+    const host = byId('upcoming-release');
+    if (!section || !host) return;
+    host.replaceChildren();
+    const today = todayInAmsterdam();
+    const list = rows(content.upcomingReleases)
+      .filter((release) => release.visible !== false && words(release.status, 'upcoming') !== 'released' && validDate(release.releaseDate) && release.releaseDate >= today)
+      .sort((a, b) => {
+        const featured = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+        return featured || a.releaseDate.localeCompare(b.releaseDate);
+      });
+    const release = list[0];
+    section.hidden = !release;
+    if (!release) return;
+    setText('upcoming-eyebrow', settings.upcoming.eyebrow);
+    setText('upcoming-title', settings.upcoming.title);
+    const card = node('article', 'featured-release upcoming-release-card');
+    const cover = node('a', 'release-art');
+    cover.href = releasePageUrl(release);
+    cover.append(artwork(release.spotifyArtwork || release.artwork));
+    const body = node('div', 'release-body');
+    body.append(node('p', 'release-badge', 'COMING SOON'));
+    body.append(node('h3', '', words(release.spotifyTitle, words(release.title, 'New release'))));
+    body.append(node('p', 'release-artist', words(release.spotifyArtist, words(release.artist))));
+    const date = validDate(release.releaseDate);
+    const dateText = date ? new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date).toUpperCase() : release.releaseDate;
+    body.append(node('p', 'release-date', dateText));
+    const remaining = daysUntil(release.releaseDate);
+    if (remaining !== null) body.append(node('p', 'release-countdown', `${remaining} ${remaining === 1 ? 'day' : 'days'} ${settings.upcoming.countdownLabel}`));
+    const action = node('a', 'button button-accent', settings.upcoming.presaveLabel);
+    action.href = releasePageUrl(release);
+    body.append(action);
+    card.append(cover, body);
+    host.append(card);
+  }
   function render(content, settings) {
     applySettings(settings);
+    renderUpcoming(content, settings);
     byId('socials').replaceChildren();
     rows(content.socials).forEach((social) => {
       const url = webUrl(social.url);
