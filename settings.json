@@ -38,7 +38,10 @@
     "moreInfoLabel": "Details coming soon",
     "emptyMessage": "New dates coming soon. Follow on Bandsintown for show updates.",
     "defaultTitle": "No Sync live",
-    "venuePendingLabel": "Venue to be announced"
+    "venuePendingLabel": "Venue to be announced",
+    "source": "bandsintown",
+    "loadingLabel": "Loading shows…",
+    "fallbackLabel": "View upcoming shows on Bandsintown"
   },
   "contact": {
     "eyebrow": "LET’S CONNECT",

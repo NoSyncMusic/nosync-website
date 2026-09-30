@@ -106,6 +106,15 @@ content:
     label: Showsectie
     type: object
     fields:
+    - name: source
+      label: Shows automatisch laden
+      type: select
+      options:
+        values:
+        - bandsintown
+        - manual
+      description: 'bandsintown: gepubliceerde shows automatisch uit Bandsintown. manual: de shows die
+        je hieronder in het CMS invult.'
     - name: eyebrow
       label: Kleine tekst boven de kop
       type: string
@@ -133,6 +142,12 @@ content:
       type: string
     - name: venuePendingLabel
       label: Tekst als de venue nog onbekend is
+      type: string
+    - name: loadingLabel
+      label: Tekst tijdens laden
+      type: string
+    - name: fallbackLabel
+      label: Linktekst als Bandsintown niet kan laden
       type: string
   - name: contact
     label: Contactsectie
@@ -356,10 +371,13 @@ content:
     - name: visible
       label: Zichtbaar
       type: boolean
+    description: Gebruikt als reserve als Bandsintown leeg of onbereikbaar is, of wanneer Homepage & kleuren → Showsectie → Shows automatisch laden op
+      manual staat. Bij bandsintown beheer je je optredens in Bandsintown for Artists.
   - name: bandsintown
     label: Bandsintown-link
     type: string
-    description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
+    description: Volledige artiestenlink met ID, bijvoorbeeld https://www.bandsintown.com/a/15598110-no-sync.
+      Deze bepaalt welke shows automatisch laden.
   - name: presskit
     label: Presskit-link
     type: string

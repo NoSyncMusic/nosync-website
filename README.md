@@ -1,3 +1,37 @@
+# Update: automatische shows via Bandsintown — 1 oktober 2026
+
+Deze update koppelt de showsectie aan het officiële Bandsintown-profiel van No Sync, artiest-ID 15598110. Publiceer nieuwe optredens in Bandsintown for Artists; de website haalt de komende shows daarna via de officiële widget op. Je hebt hiervoor geen eigen API-sleutel nodig. Deze update is voorbereid, nog niet geüpload.
+
+## Eén keer installeren
+
+Pak de ZIP uit en upload ALLE bestanden, inclusief `.pages.yml`, samen naar de hoofdmap van de bestaande repository. Kies één keer Commit changes. De bestaande media en `content.json` hoeven niet opnieuw te worden geüpload; ze zitten niet in dit updatepakket. Op Mac toont Command + Shift + . de verborgen `.pages.yml`.
+
+## Shows beheren
+
+- Beheer gepubliceerde optredens in Bandsintown for Artists, onder het profiel No Sync.
+- De koppeling gebruikt de artiestenlink bij Muziek, links & contact → Bandsintown-link.
+- Onder Homepage & kleuren → Showsectie → Shows automatisch laden staat `bandsintown`. Kies `manual` om weer alleen de CMS-shows te gebruiken.
+- De datum, locatie, showtitel en ticketlinks worden door Bandsintown geleverd. De widget toont de komende shows, zonder lokale filtering of handmatig ingestelde selectie van evenement-ID's. Nieuwe shows komen dus automatisch mee.
+- Bij de controle gaf het echte profiel 0 komende shows terug. Daarom blijven de huidige CMS-shows als reserve zichtbaar. De show Merow Presents: BASS RELATED (ADE Edition), 21 oktober, Chin Chin Club is behouden in jouw bestaande contentbestand.
+- Zodra Bandsintown komende shows teruggeeft, wordt de automatische lijst getoond en is de handmatige reserve verborgen. De twee lijsten worden niet samengevoegd; zo verschijnt dezelfde show niet dubbel.
+- Voor volledig beheer via Bandsintown: zet je huidige show ook daar online en zet vervolgens je handmatige CMS-shows op onzichtbaar of maak die lijst leeg. Dan kan een oude handmatige show niet terugkeren als de Bandsintown-lijst later leeg raakt. Tot die tijd beheer je eventuele wijzigingen of annuleringen van de reserveshow nog in het CMS.
+
+## Gedrag bij laden en storingen
+
+De widget laadt pas als een bezoeker in de buurt van de showsectie scrollt. Bij een blokkade of trage verbinding blijven de handmatige reserveshows en een directe Bandsintown-link beschikbaar. Komt de widget later alsnog binnen, dan schakelt de website naar de automatische lijst. Zonder JavaScript verwijst de showsectie direct naar Bandsintown.
+
+De widget gebruikt je actuele CMS-kleuren en het lokaal geladen DM Sans-font. De extra follow- en request-a-show-blokken worden verborgen; de Bandsintown-vermelding blijft staan. De eigen site blijft beveiligd met een Content Security Policy. Alleen de benodigde Bandsintown-script-, API- en framedomeinen zijn toegevoegd; externe inline scripts blijven geblokkeerd. De widget is code van een derde partij en maakt verbinding met Bandsintown, inclusief hun eigen widgetfunctionaliteit en metingen. De eerdere audit hieronder beschrijft de website vóór deze toevoeging.
+
+## Controle
+
+De echte Bandsintown-feed en artiestgegevens zijn opgehaald: artiestnaam No Sync, ID 15598110, 0 komende shows. De officiële widget is vervolgens gecontroleerd met die opgehaalde gegevens en met een afzonderlijke testshow, die niet is gepubliceerd en niet in deze export zit. Getest: desktop 1280 px, mobiel 390 en 320 px, geen horizontale overflow, geen dubbele handmatige show bij geladen Bandsintown-shows, lege feed, handmatige modus en geblokkeerde widget. De testomgeving heeft trage externe verbindingen; de widgettests gebruiken lokale kopieën van de officiële widget en vastgelegde of gesimuleerde antwoorden. De productiecode haalt alles rechtstreeks van Bandsintown.
+
+Officiële uitleg: https://help.artists.bandsintown.com/en/articles/7053470-sync-your-events-to-your-website
+
+---
+
+## Eerdere volledige beoordeling (30 september 2026)
+
 # No Sync — websitecheck en uploadpakket
 
 Beoordeling en export: 30 september 2026. Gebaseerd op de huidige website in NoSyncMusic/nosync-website, inclusief de CMS-wijziging van de showtitel naar TBA (commit 4f0f00d).

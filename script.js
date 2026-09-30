@@ -256,6 +256,7 @@
     });
     visibility('links', byId('link-grid').childElementCount > 0);
     renderShows(content, settings);
+    document.dispatchEvent(new CustomEvent('nosync:content-ready', { detail: { content, settings } }));
     updateExternal('bandsintown', content.bandsintown);
     updateExternal('presskit', content.presskit);
     byId('contacts').replaceChildren();

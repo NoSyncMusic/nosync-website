@@ -147,3 +147,15 @@ h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(40px, 5vw, 60
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* The official Bandsintown widget uses the site's local font and theme. */
+#shows-loading { color: var(--secondary); font-size: 14px; padding-block: 24px; }
+#bandsintown-events { min-width: 0; }
+#bandsintown-events:not([data-ready]) { visibility: hidden; }
+#bandsintown-events .bit-widget { font-family: 'DM Sans', sans-serif; }
+#bandsintown-events .bit-widget-container { max-width: 100%; }
+#bandsintown-events a:focus-visible { outline: 3px solid var(--accent-ink); outline-offset: 4px; }
+
+#bandsintown-events .bit-follow-section-wrapper,
+#bandsintown-events .bit-play-my-city-wrapper { display: none; }
+#bandsintown-events .bit-offers { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
