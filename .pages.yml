@@ -14,6 +14,10 @@ content:
   - name: pageTitle
     label: Titel in het browsertabblad
     type: string
+  - name: description
+    label: Omschrijving voor zoekmachines
+    type: text
+    description: Korte Engelse omschrijving van de artiest en website.
   - name: hero
     label: Bovenkant homepage
     type: object
@@ -22,8 +26,7 @@ content:
       label: Grote titel
       type: text
       required: true
-      description: Elke regel staat op desktop op een nieuwe regel. Bijvoorbeeld NO
-        en SYNC.
+      description: Elke regel staat op desktop op een nieuwe regel. Bijvoorbeeld NO en SYNC.
     - name: suffix
       label: Teken achter de titel
       type: string
@@ -85,6 +88,9 @@ content:
     - name: spotifyLabel
       label: Tekst Spotify-link
       type: string
+    - name: morePlatformsLabel
+      label: Tekst voor overige luisterplatforms
+      type: string
   - name: links
     label: Sectie met sets en playlists
     type: object
@@ -125,6 +131,9 @@ content:
     - name: defaultTitle
       label: Terugvaltekst als een show geen titel heeft
       type: string
+    - name: venuePendingLabel
+      label: Tekst als de venue nog onbekend is
+      type: string
   - name: contact
     label: Contactsectie
     type: object
@@ -154,69 +163,71 @@ content:
     type: object
     fields:
     - name: accent
-      label: Accentkleur (nu rood)
+      label: Accentkleur (knoppen en details)
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #ff535a.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: background
       label: Achtergrondkleur
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #101010.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: text
       label: Tekstkleur
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #f5f4ef.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: headings
       label: Kleur van grote titels en koppen
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #f5f4ef.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: secondary
       label: Kleur van ondertitels en overige kleine tekst
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #aaa9a3.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: buttonText
       label: Tekstkleur van de gekleurde luisterknop
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #101010.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: surface
       label: Achtergrondkleur van kaarten
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #191919.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
     - name: borders
       label: Kleur van lijnen en randen
       type: string
       required: true
-      description: 'HEX-kleurcode, bijvoorbeeld #30302d.'
+      description: 'HEX-kleurcode met 3 of 6 tekens; # is optioneel. Bijvoorbeeld #D94A4A of #fff.'
       pattern:
-        regex: ^#[0-9a-fA-F]{6}$
-        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+        regex: ^\s*#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\s*$
+        message: 'Gebruik een geldige HEX-kleurcode, bijvoorbeeld #D94A4A.'
+    description: Rood blijft een accent. Kleine accentteksten en knoptekst worden zo nodig aangepast voor
+      leesbaar contrast. Controleer je eigen tekstkleuren na wijzigingen.
 - name: homepage
   label: Muziek, links & contact
   type: file
@@ -243,6 +254,7 @@ content:
     - name: url
       label: Link
       type: string
+      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
     - name: label
       label: Eigen tekst voor deze link (optioneel)
       type: string
@@ -291,6 +303,7 @@ content:
       - name: url
         label: Link
         type: string
+        description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
       - name: label
         label: Eigen tekst voor deze link (optioneel)
         type: string
@@ -308,6 +321,7 @@ content:
     - name: url
       label: Link
       type: string
+      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
     - name: image
       label: Afbeelding
       type: image
@@ -322,6 +336,7 @@ content:
     - name: date
       label: Datum (JJJJ-MM-DD)
       type: string
+      description: Gebruik JJJJ-MM-DD. Alleen geldige datums vanaf vandaag (Nederlandse tijd) worden getoond.
     - name: title
       label: Evenement
       type: string
@@ -334,6 +349,7 @@ content:
     - name: ticketUrl
       label: Ticketlink (leeg als nog onbekend)
       type: string
+      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
     - name: soldOut
       label: Uitverkocht
       type: boolean
@@ -343,9 +359,11 @@ content:
   - name: bandsintown
     label: Bandsintown-link
     type: string
+    description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
   - name: presskit
     label: Presskit-link
     type: string
+    description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
   - name: contacts
     label: Contactgegevens
     type: object
