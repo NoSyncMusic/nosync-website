@@ -46,13 +46,13 @@
     "backToTop": "Back to top"
   },
   "colors": {
-    "accent": "#721E1E",
+    "accent": "#D94A4A",
     "background": "#101010",
-    "text": "#721E1E",
-    "headings": "#721E1E",
-    "secondary": "#aaa9a3",
+    "text": "#E5E5E5",
+    "headings": "#F5F5F5",
+    "secondary": "#A3A3A3",
     "buttonText": "#101010",
     "surface": "#191919",
-    "borders": "#30302d"
+    "borders": "#333333"
   }
 }
