@@ -5,8 +5,8 @@ const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
 if (!clientId || !clientSecret) {
-  console.error('SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET are required.');
-  process.exit(1);
+  console.log('Spotify sync skipped: add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET as GitHub Actions secrets.');
+  process.exit(0);
 }
 
 const normalizeIsrc = (value = '') => String(value).toUpperCase().replace(/[^A-Z0-9]/g, '');
