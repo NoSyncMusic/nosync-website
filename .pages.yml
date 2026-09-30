@@ -2,24 +2,227 @@ media:
   input: media
   output: media
 content:
+- name: appearance
+  label: Homepage & kleuren
+  type: file
+  path: settings.json
+  format: json
+  fields:
+  - name: artistName
+    label: Artiestennaam
+    type: string
+  - name: pageTitle
+    label: Titel in het browsertabblad
+    type: string
+  - name: hero
+    label: Bovenkant homepage
+    type: object
+    fields:
+    - name: title
+      label: Grote titel
+      type: text
+      required: true
+      description: Elke regel staat op desktop op een nieuwe regel. Bijvoorbeeld NO
+        en SYNC.
+    - name: suffix
+      label: Teken achter de titel
+      type: string
+      description: Bijvoorbeeld een punt. Maak leeg om het weg te laten.
+    - name: tagline
+      label: Tekst boven de grote titel
+      type: string
+    - name: genres
+      label: Tekst onder de grote titel
+      type: string
+    - name: intro
+      label: Extra introductietekst
+      type: text
+      description: Optioneel. Een leeg veld wordt niet getoond.
+    - name: image
+      label: Artiestenfoto
+      type: image
+    - name: logo
+      label: Logo
+      type: image
+    - name: photoCaption
+      label: Tekst onderaan de foto
+      type: string
+    - name: listenButton
+      label: Tekst luisterknop
+      type: string
+      required: true
+    - name: bookingButton
+      label: Tekst contactknop
+      type: string
+      required: true
+  - name: navigation
+    label: Menu
+    type: object
+    fields:
+    - name: music
+      label: Muziek
+      type: string
+    - name: explore
+      label: Sets en playlists
+      type: string
+    - name: shows
+      label: Shows
+      type: string
+    - name: contact
+      label: Contact
+      type: string
+  - name: music
+    label: Muzieksectie
+    type: object
+    fields:
+    - name: eyebrow
+      label: Kleine tekst boven de kop
+      type: string
+    - name: title
+      label: Kop
+      type: string
+      required: true
+    - name: spotifyLabel
+      label: Tekst Spotify-link
+      type: string
+  - name: links
+    label: Sectie met sets en playlists
+    type: object
+    fields:
+    - name: eyebrow
+      label: Kleine tekst boven de kop
+      type: string
+    - name: title
+      label: Kop
+      type: string
+      required: true
+  - name: shows
+    label: Showsectie
+    type: object
+    fields:
+    - name: eyebrow
+      label: Kleine tekst boven de kop
+      type: string
+    - name: title
+      label: Kop
+      type: string
+      required: true
+    - name: bandsintownLabel
+      label: Tekst Bandsintown-link
+      type: string
+    - name: ticketLabel
+      label: Tekst ticketknop
+      type: string
+    - name: soldOutLabel
+      label: Tekst bij uitverkocht
+      type: string
+    - name: moreInfoLabel
+      label: Tekst als ticketlink nog ontbreekt
+      type: string
+    - name: emptyMessage
+      label: Tekst als er geen komende shows zijn
+      type: text
+    - name: defaultTitle
+      label: Terugvaltekst als een show geen titel heeft
+      type: string
+  - name: contact
+    label: Contactsectie
+    type: object
+    fields:
+    - name: eyebrow
+      label: Kleine tekst boven de kop
+      type: string
+    - name: title
+      label: Kop
+      type: string
+      required: true
+    - name: presskitLabel
+      label: Tekst presskitknop
+      type: string
+  - name: footer
+    label: Onderaan de website
+    type: object
+    fields:
+    - name: name
+      label: Naam naast het copyrightjaar
+      type: string
+    - name: backToTop
+      label: Tekst terug naar boven
+      type: string
+  - name: colors
+    label: Kleuren
+    type: object
+    fields:
+    - name: accent
+      label: Accentkleur (nu rood)
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #ff535a.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: background
+      label: Achtergrondkleur
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #101010.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: text
+      label: Tekstkleur
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #f5f4ef.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: headings
+      label: Kleur van grote titels en koppen
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #f5f4ef.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: secondary
+      label: Kleur van ondertitels en overige kleine tekst
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #aaa9a3.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: buttonText
+      label: Tekstkleur van de gekleurde luisterknop
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #101010.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: surface
+      label: Achtergrondkleur van kaarten
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #191919.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
+    - name: borders
+      label: Kleur van lijnen en randen
+      type: string
+      required: true
+      description: 'HEX-kleurcode, bijvoorbeeld #30302d.'
+      pattern:
+        regex: ^#[0-9a-fA-F]{6}$
+        message: 'Gebruik # gevolgd door 6 tekens, bijvoorbeeld #ff535a.'
 - name: homepage
-  label: No Sync website
+  label: Muziek, links & contact
   type: file
   path: content.json
   format: json
   fields:
-  - name: tagline
-    label: Ondertitel
-    type: string
-  - name: genres
-    label: Genres
-    type: string
-  - name: heroImage
-    label: Artiestenfoto
-    type: image
-  - name: logo
-    label: Logo
-    type: image
   - name: socials
     label: Socials
     type: object
@@ -39,6 +242,9 @@ content:
         - TWITTER
     - name: url
       label: Link
+      type: string
+    - name: label
+      label: Eigen tekst voor deze link (optioneel)
       type: string
   - name: releases
     label: Releases
@@ -84,6 +290,9 @@ content:
           - TIDAL
       - name: url
         label: Link
+        type: string
+      - name: label
+        label: Eigen tekst voor deze link (optioneel)
         type: string
   - name: links
     label: Sets, playlists en overige links

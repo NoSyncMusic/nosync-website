@@ -1,0 +1,60 @@
+{
+  "artistName": "No Sync",
+  "pageTitle": "No Sync — Music, shows & more",
+  "hero": {
+    "title": "NO\nSYNC",
+    "suffix": ".",
+    "tagline": "DJ / PRODUCER",
+    "genres": "Bass House · Drum & Bass",
+    "intro": "",
+    "image": "media/artist.png",
+    "logo": "media/logo.png",
+    "photoCaption": "NO SYNC / THE NETHERLANDS",
+    "listenButton": "Listen now",
+    "bookingButton": "Bookings & press"
+  },
+  "navigation": {
+    "music": "Music",
+    "explore": "Explore",
+    "shows": "Shows",
+    "contact": "Contact"
+  },
+  "music": {
+    "eyebrow": "TURN IT UP",
+    "title": "The music.",
+    "spotifyLabel": "More on Spotify"
+  },
+  "links": {
+    "eyebrow": "BEYOND THE RELEASES",
+    "title": "In the mix."
+  },
+  "shows": {
+    "eyebrow": "SEE YOU THERE",
+    "title": "Live.",
+    "bandsintownLabel": "Follow on Bandsintown",
+    "ticketLabel": "Tickets",
+    "soldOutLabel": "Sold out",
+    "moreInfoLabel": "More info soon",
+    "emptyMessage": "New dates coming soon. Follow on Bandsintown for show updates.",
+    "defaultTitle": "No Sync live"
+  },
+  "contact": {
+    "eyebrow": "LET’S CONNECT",
+    "title": "Get in touch.",
+    "presskitLabel": "Open press kit"
+  },
+  "footer": {
+    "name": "NO SYNC",
+    "backToTop": "Back to top"
+  },
+  "colors": {
+    "accent": "#ff535a",
+    "background": "#101010",
+    "text": "#f5f4ef",
+    "headings": "#f5f4ef",
+    "secondary": "#aaa9a3",
+    "buttonText": "#101010",
+    "surface": "#191919",
+    "borders": "#30302d"
+  }
+}

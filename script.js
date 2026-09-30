@@ -8,16 +8,37 @@ function safeUrl(value, mail=false) {
 }
 function link(text,url,cls) {const a=node('a',cls,text);const href=safeUrl(url);if(!href)return null;a.href=href;a.target='_blank';a.rel='noopener noreferrer';return a;}
 function image(src,alt,cls) {const img=node('img',cls);img.alt=alt;img.loading='lazy';const url=safeUrl(src);if(url)img.src=url;img.addEventListener('error',()=>{img.hidden=true;});return img;}
-function platforms(items,compact=false) {const box=node('div','platforms');(items||[]).forEach(item=>{const a=link(labels[item.type]||item.label||item.type,item.url,compact&&!['SPOTIFY','APPLE_MUSIC'].includes(item.type)?'other-platform':'');if(a)box.append(a);});return box;}
+function platforms(items,compact=false) {const box=node('div','platforms');(items||[]).forEach(item=>{const a=link(item.label||labels[item.type]||item.type,item.url,compact&&!['SPOTIFY','APPLE_MUSIC'].includes(item.type)?'other-platform':'');if(a)box.append(a);});return box;}
 function releaseCard(item,featured=false) {
   const article=node('article',featured?'feature':'release');article.append(image(item.artwork,item.title+' artwork'));
   const text=node('div');if(featured)text.append(node('p','eyebrow',item.badge||'FEATURED RELEASE'));
   text.append(node('h3','',item.title),node('p','',item.artist));text.append(platforms(item.links,!featured));article.append(text);return article;
 }
-function render(data) {
-  byId('tagline').textContent=data.tagline||'DJ / PRODUCER';byId('genres').textContent=data.genres||'';
-  const photo=safeUrl(data.heroImage);if(photo)byId('artist-photo').src=photo;const logo=safeUrl(data.logo);if(logo)byId('artist-logo').src=logo;
-  (data.socials||[]).forEach(item=>{const a=link(labels[item.type]||item.label||item.type,item.url);if(a)byId('socials').append(a);});
+function applySettings(settings,data) {
+  const hero=settings.hero||{},nav=settings.navigation||{};
+  const text=(id,value)=>{if(typeof value==='string')byId(id).textContent=value;};
+  const vars={background:'--bg',text:'--text',headings:'--heading',secondary:'--muted',accent:'--accent',buttonText:'--button-text',surface:'--surface',borders:'--border'};
+  Object.entries(vars).forEach(([key,css])=>{const value=settings.colors?.[key];if(typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value))document.documentElement.style.setProperty(css,value);});
+  document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  const artist=settings.artistName||'No Sync';byId('artist-photo').alt=artist;byId('artist-logo').alt=artist;document.querySelector('.wordmark').setAttribute('aria-label',artist+' home');
+  if(typeof settings.pageTitle==='string'&&settings.pageTitle.trim())document.title=settings.pageTitle;
+  text('footer-name',settings.footer?.name||artist.toUpperCase());text('back-to-top',settings.footer?.backToTop);
+  text('tagline',hero.tagline??data.tagline??'DJ / PRODUCER');text('genres',hero.genres??data.genres??'');
+  if(typeof hero.title==='string'&&hero.title.trim()) {
+    const heading=byId('artist-name');heading.replaceChildren();const lines=hero.title.split(/\r?\n/);
+    lines.forEach((line,index)=>{const span=node('span','title-line',line);if(index===lines.length-1&&hero.suffix)span.append(node('span','period',hero.suffix));heading.append(span);});
+    heading.setAttribute('aria-label',hero.title.replace(/\s+/g,' ').trim());
+  }
+  text('hero-intro',hero.intro);byId('hero-intro').hidden=!hero.intro;
+  text('listen-button',hero.listenButton);text('booking-button',hero.bookingButton);text('photo-caption',hero.photoCaption);
+  const photo=safeUrl(hero.image||data.heroImage);if(photo)byId('artist-photo').src=photo;const logo=safeUrl(hero.logo||data.logo);if(logo)byId('artist-logo').src=logo;
+  [['music','nav-music'],['explore','nav-links'],['shows','nav-shows'],['contact','nav-contact']].forEach(([key,id])=>text(id,nav[key]));
+  for(const key of ['music','links','shows','contact']) {text(key+'-eyebrow',settings[key]?.eyebrow);text(key+'-title',settings[key]?.title);}
+  text('spotify-profile',settings.music?.spotifyLabel);text('bandsintown',settings.shows?.bandsintownLabel);text('presskit',settings.contact?.presskitLabel);
+}
+function render(data,settings={}) {
+  applySettings(settings,data);
+  (data.socials||[]).forEach(item=>{const a=link(item.label||labels[item.type]||item.type,item.url);if(a)byId('socials').append(a);});
   const spotify=(data.socials||[]).find(x=>x.type==='SPOTIFY');if(spotify&&safeUrl(spotify.url))byId('spotify-profile').href=safeUrl(spotify.url);
   const releases=(data.releases||[]).filter(x=>x.visible!==false);const featured=releases.find(x=>x.featured)||releases[0];
   if(featured)byId('featured').append(releaseCard(featured,true));releases.filter(x=>x!==featured).forEach(item=>byId('releases').append(releaseCard(item)));
@@ -26,11 +47,13 @@ function render(data) {
   if(!byId('link-grid').children.length)byId('links').hidden=true;
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Amsterdam'});
   const shows=(data.shows||[]).filter(x=>x.visible!==false&&x.date&&x.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
-  shows.forEach(item=>{const row=node('article','show');const date=new Date(item.date+'T12:00:00Z');if(Number.isNaN(date.getTime()))return;const time=node('time','date',String(date.getUTCDate()).padStart(2,'0'));time.dateTime=item.date;time.append(node('small','',date.toLocaleDateString('en-GB',{month:'short',timeZone:'UTC'}).toUpperCase()+' '+date.getUTCFullYear()));row.append(time);const detail=node('div');detail.append(node('h3','',item.title||item.venue||'No Sync live'),node('p','',[item.venue,item.location].filter(Boolean).join(' · ')));row.append(detail);const ticket=safeUrl(item.ticketUrl);if(ticket){const a=link(item.soldOut?'Sold out':'Tickets',ticket,'button');if(a)row.append(a);}else row.append(node('span','show-note','More info soon'));byId('show-list').append(row);});
-  if(!shows.length)byId('show-list').append(node('p','empty','New dates coming soon. Follow on Bandsintown for show updates.'));
+  shows.forEach(item=>{const row=node('article','show');const date=new Date(item.date+'T12:00:00Z');if(Number.isNaN(date.getTime()))return;const time=node('time','date',String(date.getUTCDate()).padStart(2,'0'));time.dateTime=item.date;time.append(node('small','',date.toLocaleDateString('en-GB',{month:'short',timeZone:'UTC'}).toUpperCase()+' '+date.getUTCFullYear()));row.append(time);const detail=node('div');detail.append(node('h3','',item.title||item.venue||settings.shows?.defaultTitle||'No Sync live'),node('p','',[item.venue,item.location].filter(Boolean).join(' · ')));row.append(detail);const ticket=safeUrl(item.ticketUrl);if(ticket){const a=link(item.soldOut?(settings.shows?.soldOutLabel||'Sold out'):(settings.shows?.ticketLabel||'Tickets'),ticket,'button');if(a)row.append(a);}else row.append(node('span','show-note',settings.shows?.moreInfoLabel??'More info soon'));byId('show-list').append(row);});
+  if(!shows.length)byId('show-list').append(node('p','empty',settings.shows?.emptyMessage??'New dates coming soon. Follow on Bandsintown for show updates.'));
   if(safeUrl(data.bandsintown))byId('bandsintown').href=safeUrl(data.bandsintown);
   (data.contacts||[]).forEach(item=>{if(typeof item.email!=='string'||!/^\S+@\S+\.\S+$/.test(item.email))return;const box=node('div');box.append(node('p','contact-label',item.label));const a=node('a','contact-email',item.email);a.href='mailto:'+item.email;box.append(a);if(item.note)box.append(node('p','contact-note',item.note));byId('contacts').append(box);});
   const press=safeUrl(data.presskit);if(press){byId('presskit').href=press;byId('presskit').hidden=false;}
   byId('year').textContent=String(new Date().getFullYear());
 }
-fetch('content.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw new Error('Content unavailable');return response.json();}).then(render).catch(()=>{byId('load-error').hidden=false;});
+const content=fetch('content.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw new Error('Content unavailable');return response.json();});
+const settings=fetch('settings.json',{cache:'no-store'}).then(response=>response.ok?response.json():{}).catch(()=>({}));
+Promise.all([content,settings]).then(([data,config])=>render(data,config)).catch(()=>{byId('load-error').hidden=false;});

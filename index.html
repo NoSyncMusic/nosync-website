@@ -14,7 +14,7 @@
   <a class="skip" href="#music">Skip to music</a>
   <header class="site-header wrap">
     <a class="wordmark" href="#" aria-label="No Sync home"><span class="logo-window"><img id="artist-logo" src="media/logo.png" alt="No Sync"></span></a>
-    <nav aria-label="Main navigation"><a href="#music">Music</a><a href="#links">Explore</a><a href="#shows">Shows</a><a href="#contact">Contact</a></nav>
+    <nav aria-label="Main navigation"><a id="nav-music" href="#music">Music</a><a id="nav-links" href="#links">Explore</a><a id="nav-shows" href="#shows">Shows</a><a id="nav-contact" href="#contact">Contact</a></nav>
   </header>
   <main>
     <section class="hero wrap" aria-labelledby="artist-name">
@@ -22,21 +22,22 @@
         <p class="eyebrow" id="tagline">DJ / PRODUCER</p>
         <h1 id="artist-name">NO<br>SYNC<span class="period">.</span></h1>
         <p class="hero-genres" id="genres">Bass House · Drum & Bass</p>
-        <div class="hero-actions"><a class="button primary" href="#music">Listen now</a><a class="button" href="#contact">Bookings & press</a></div>
+        <p class="hero-intro" id="hero-intro" hidden></p>
+        <div class="hero-actions"><a id="listen-button" class="button primary" href="#music">Listen now</a><a id="booking-button" class="button" href="#contact">Bookings & press</a></div>
         <div class="socials" id="socials" aria-label="Social media"></div>
       </div>
-      <div class="hero-image"><img id="artist-photo" src="media/artist.png" alt="No Sync" fetchpriority="high"><span class="photo-caption">NO SYNC / THE NETHERLANDS</span></div>
+      <div class="hero-image"><img id="artist-photo" src="media/artist.png" alt="No Sync" fetchpriority="high"><span id="photo-caption" class="photo-caption">NO SYNC / THE NETHERLANDS</span></div>
     </section>
     <section class="wrap section" id="music" aria-labelledby="music-title">
-      <div class="section-heading"><div><p class="eyebrow">TURN IT UP</p><h2 id="music-title">The music.</h2></div><a id="spotify-profile" class="text-link" href="https://open.spotify.com/artist/6jG0cf5NUIIkxydJ9zTa8B" target="_blank" rel="noopener noreferrer">More on Spotify</a></div>
+      <div class="section-heading"><div><p id="music-eyebrow" class="eyebrow">TURN IT UP</p><h2 id="music-title">The music.</h2></div><a id="spotify-profile" class="text-link" href="https://open.spotify.com/artist/6jG0cf5NUIIkxydJ9zTa8B" target="_blank" rel="noopener noreferrer">More on Spotify</a></div>
       <div id="featured"></div><div class="releases" id="releases"></div>
     </section>
-    <section class="wrap section" id="links" aria-labelledby="links-title"><div class="section-heading"><div><p class="eyebrow">BEYOND THE RELEASES</p><h2 id="links-title">In the mix.</h2></div></div><div class="link-grid" id="link-grid"></div></section>
-    <section class="wrap section" id="shows" aria-labelledby="shows-title"><div class="section-heading"><div><p class="eyebrow">SEE YOU THERE</p><h2 id="shows-title">Live.</h2></div><a class="text-link" id="bandsintown" href="https://www.bandsintown.com/a/15598110-no-sync" target="_blank" rel="noopener noreferrer">Follow on Bandsintown</a></div><div id="show-list"></div></section>
-    <section class="wrap section contact-section" id="contact" aria-labelledby="contact-title"><div><p class="eyebrow">LET’S CONNECT</p><h2 id="contact-title">Get in touch.</h2><a id="presskit" class="button" target="_blank" rel="noopener noreferrer" hidden>Open press kit</a></div><div class="contacts" id="contacts"></div></section>
+    <section class="wrap section" id="links" aria-labelledby="links-title"><div class="section-heading"><div><p id="links-eyebrow" class="eyebrow">BEYOND THE RELEASES</p><h2 id="links-title">In the mix.</h2></div></div><div class="link-grid" id="link-grid"></div></section>
+    <section class="wrap section" id="shows" aria-labelledby="shows-title"><div class="section-heading"><div><p id="shows-eyebrow" class="eyebrow">SEE YOU THERE</p><h2 id="shows-title">Live.</h2></div><a class="text-link" id="bandsintown" href="https://www.bandsintown.com/a/15598110-no-sync" target="_blank" rel="noopener noreferrer">Follow on Bandsintown</a></div><div id="show-list"></div></section>
+    <section class="wrap section contact-section" id="contact" aria-labelledby="contact-title"><div><p id="contact-eyebrow" class="eyebrow">LET’S CONNECT</p><h2 id="contact-title">Get in touch.</h2><a id="presskit" class="button" target="_blank" rel="noopener noreferrer" hidden>Open press kit</a></div><div class="contacts" id="contacts"></div></section>
     <p class="wrap load-error" id="load-error" role="alert" hidden>The page could not load. Please refresh, or contact <a href="mailto:info@nosyncmusic.com">info@nosyncmusic.com</a>.</p>
     <noscript><p class="wrap">Enable JavaScript to view releases and links. <a href="https://open.spotify.com/artist/6jG0cf5NUIIkxydJ9zTa8B">Listen on Spotify</a> or <a href="mailto:bookings@nosyncmusic.com">get in touch</a>.</p></noscript>
   </main>
-  <footer class="wrap"><span>© <span id="year">2026</span> NO SYNC</span><a href="#">Back to top</a></footer>
+  <footer class="wrap"><span>© <span id="year">2026</span> <span id="footer-name">NO SYNC</span></span><a id="back-to-top" href="#">Back to top</a></footer>
 </body>
 </html>
