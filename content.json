@@ -1,8 +1,4 @@
 {
-  "tagline": "DJ / PRODUCER",
-  "genres": "Bass House · Drum & Bass",
-  "heroImage": "media/artist.png",
-  "logo": "media/logo.png",
   "socials": [
     {
       "type": "INSTAGRAM",
@@ -218,7 +214,7 @@
   "shows": [
     {
       "date": "2026-10-21",
-      "title": "No Sync live",
+      "title": "TBA",
       "venue": "TBA",
       "location": "Amsterdam, NL",
       "soldOut": false,
