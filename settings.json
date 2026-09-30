@@ -1,12 +1,10 @@
 {
   "artistName": "No Sync",
-  "pageTitle": "No Sync — Music, shows & more",
+  "pageTitle": "No Sync — DJ & Producer",
   "hero": {
     "title": "NO\nSYNC",
-    "suffix": ".",
     "tagline": "DJ / PRODUCER",
-    "genres": "Bass House · Drum & Bass",
-    "intro": "",
+    "genres": "Bass House · Tech House",
     "image": "media/artist.png",
     "logo": "media/logo.png",
     "photoCaption": "NO SYNC / THE NETHERLANDS",
@@ -15,7 +13,7 @@
   },
   "navigation": {
     "music": "Music",
-    "explore": "Explore",
+    "explore": "Sets and playlists",
     "shows": "Shows",
     "contact": "Contact"
   },
@@ -48,10 +46,10 @@
     "backToTop": "Back to top"
   },
   "colors": {
-    "accent": "#ff535a",
+    "accent": "#721E1E",
     "background": "#101010",
-    "text": "#f5f4ef",
-    "headings": "#f5f4ef",
+    "text": "#721E1E",
+    "headings": "#721E1E",
     "secondary": "#aaa9a3",
     "buttonText": "#101010",
     "surface": "#191919",
