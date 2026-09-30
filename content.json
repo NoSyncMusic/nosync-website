@@ -39,8 +39,8 @@
       "artist": "Urban Dolhar & No Sync",
       "artwork": "media/i-just-wanna-know.jpg",
       "featured": true,
-      "visible": true,
       "badge": "OUT NOW",
+      "visible": true,
       "links": [
         {
           "type": "DEEZER",
@@ -85,8 +85,8 @@
       "artist": "James O'Hea & No Sync",
       "artwork": "media/hold-me-closer.jpg",
       "featured": false,
-      "visible": true,
       "badge": "OUT NOW",
+      "visible": true,
       "links": [
         {
           "type": "DEEZER",
@@ -111,8 +111,8 @@
       "artist": "No Sync",
       "artwork": "media/move-your-body.jpg",
       "featured": false,
-      "visible": true,
       "badge": "OUT NOW",
+      "visible": true,
       "links": [
         {
           "type": "DEEZER",
@@ -137,8 +137,8 @@
       "artist": "No Sync",
       "artwork": "media/in-your-eyes.jpg",
       "featured": false,
-      "visible": true,
       "badge": "OUT NOW",
+      "visible": true,
       "links": [
         {
           "type": "DEEZER",
@@ -163,8 +163,8 @@
       "artist": "BREDDEX & No Sync",
       "artwork": "media/vuurballon-no-sync-remix.jpg",
       "featured": false,
-      "visible": true,
       "badge": "OUT NOW",
+      "visible": true,
       "links": [
         {
           "type": "DEEZER",
@@ -188,30 +188,30 @@
   "links": [
     {
       "title": "Pitch your Release HERE!",
+      "subtitle": "Submit your music for playlist consideration",
       "url": "https://pitchplaylists.com/submit-public-page/6a84ba90c9c40e3c46b98167",
       "image": "media/link-1.png",
-      "subtitle": "Submit your music for playlist consideration",
       "visible": true
     },
     {
       "title": "No Sync - Stookhoksessies #452",
+      "subtitle": "Full DJ set",
       "url": "https://on.soundcloud.com/iCJ76i5EbnoTITB7kY",
       "image": "media/link-2.jpeg",
-      "subtitle": "Full DJ set",
       "visible": true
     },
     {
       "title": "AFTERHOURS 🔥 Bass House & Tech",
+      "subtitle": "Curated by No Sync",
       "url": "https://open.spotify.com/playlist/4mn0Oxq9E6ewMXWpRuNkmw?si=f2465a4502064b3b",
       "image": "media/link-3.png",
-      "subtitle": "Curated by No Sync",
       "visible": true
     },
     {
       "title": "Megisto feat. Myke Tyler - All I Need Is You (No Sync Remix)",
+      "subtitle": "Free download",
       "url": "https://soundcloud.com/nosyncmusic/megisto-feat-myke-tyler-all-i?si=20c73729144942f1becafabe64c7b2bc&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
       "image": "media/link-4.png",
-      "subtitle": "Free download",
       "visible": true
     }
   ],
@@ -221,7 +221,6 @@
       "title": "No Sync live",
       "venue": "TBA",
       "location": "Amsterdam, NL",
-      "ticketUrl": "",
       "soldOut": false,
       "visible": true
     }
@@ -230,24 +229,21 @@
   "presskit": "https://www.dropbox.com/scl/fo/finst4jvknujybkqanqt7/ADovADNaUHs3ETtZ529AyeE?rlkey=0q7bg17sqs5t1dg1ba6v7e5a1",
   "contacts": [
     {
+      "label": "General",
+      "email": "info@nosyncmusic.com"
+    },
+    {
       "label": "Bookings",
-      "email": "bookings@nosyncmusic.com",
-      "note": ""
+      "email": "bookings@nosyncmusic.com"
     },
     {
       "label": "Management",
-      "email": "tom@nosyncmusic.com",
-      "note": ""
+      "email": "tom@nosyncmusic.com"
     },
     {
       "label": "Demos",
       "email": "demo@nosyncmusic.com",
       "note": "SoundCloud, Demmo or Dropbox links only."
-    },
-    {
-      "label": "General",
-      "email": "info@nosyncmusic.com",
-      "note": ""
     }
   ]
 }
