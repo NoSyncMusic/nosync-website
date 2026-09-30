@@ -62,5 +62,13 @@
     "surface": "#191919",
     "borders": "#333333"
   },
-  "description": "No Sync is a Dutch DJ and producer making Bass House and Tech House. Explore releases, DJ sets, playlists and upcoming shows."
+  "description": "No Sync is a Dutch DJ and producer making Bass House and Tech House. Explore releases, DJ sets, playlists and upcoming shows.",
+  "upcoming": {
+    "eyebrow": "COMING SOON",
+    "title": "Next release.",
+    "presaveLabel": "Pre-save on Spotify",
+    "releasedLabel": "Listen on Spotify",
+    "followNote": "Spotify may ask for permission to save the release and follow No Sync.",
+    "countdownLabel": "until release"
+  }
 }
