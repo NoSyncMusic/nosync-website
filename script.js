@@ -335,6 +335,14 @@
     } finally { clearTimeout(timeout); }
   }
   const snapshot = JSON.parse(byId('published-data').textContent);
+  snapshot.settings.upcoming = snapshot.settings.upcoming || {
+    eyebrow: 'COMING SOON',
+    title: 'Next release.',
+    presaveLabel: 'Pre-save on Spotify',
+    releasedLabel: 'Listen on Spotify',
+    followNote: 'Spotify may ask for permission to save the release and follow No Sync.',
+    countdownLabel: 'until release'
+  };
   applySettings(snapshot.settings);
   Promise.allSettled([freshJson('content.json'), freshJson('settings.json')]).then(([content, settings]) => {
     render(content.status === 'fulfilled' ? content.value : snapshot.content,
