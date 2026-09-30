@@ -236,7 +236,7 @@
   }
   function releasePageUrl(release) {
     const slug = releaseSlug(release);
-    return slug ? `presave/?release=${encodeURIComponent(slug)}` : '#';
+    return slug ? `presave/${encodeURIComponent(slug)}/` : '#';
   }
   function renderUpcoming(content, settings) {
     const section = byId('upcoming');
