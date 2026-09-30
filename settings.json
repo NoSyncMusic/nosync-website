@@ -5,22 +5,25 @@
     "title": "NO\nSYNC",
     "tagline": "DJ / PRODUCER",
     "genres": "Bass House · Tech House",
-    "image": "media/artist.png",
-    "logo": "media/logo.png",
+    "image": "media/artist.webp",
+    "logo": "media/logo.webp",
     "photoCaption": "NO SYNC / THE NETHERLANDS",
     "listenButton": "Listen now",
-    "bookingButton": "Bookings & press"
+    "bookingButton": "Bookings & press",
+    "suffix": "",
+    "intro": ""
   },
   "navigation": {
     "music": "Music",
-    "explore": "Sets and playlists",
+    "explore": "Explore",
     "shows": "Shows",
     "contact": "Contact"
   },
   "music": {
     "eyebrow": "TURN IT UP",
-    "title": "The music.",
-    "spotifyLabel": "More on Spotify"
+    "title": "Releases.",
+    "spotifyLabel": "More on Spotify",
+    "morePlatformsLabel": "More platforms"
   },
   "links": {
     "eyebrow": "BEYOND THE RELEASES",
@@ -28,17 +31,18 @@
   },
   "shows": {
     "eyebrow": "SEE YOU THERE",
-    "title": "Live.",
+    "title": "Upcoming shows.",
     "bandsintownLabel": "Follow on Bandsintown",
     "ticketLabel": "Tickets",
     "soldOutLabel": "Sold out",
-    "moreInfoLabel": "More info soon",
+    "moreInfoLabel": "Details coming soon",
     "emptyMessage": "New dates coming soon. Follow on Bandsintown for show updates.",
-    "defaultTitle": "No Sync live"
+    "defaultTitle": "No Sync live",
+    "venuePendingLabel": "Venue to be announced"
   },
   "contact": {
     "eyebrow": "LET’S CONNECT",
-    "title": "Get in touch.",
+    "title": "Bookings & contact.",
     "presskitLabel": "Open press kit"
   },
   "footer": {
@@ -54,5 +58,6 @@
     "buttonText": "#101010",
     "surface": "#191919",
     "borders": "#333333"
-  }
+  },
+  "description": "No Sync is a Dutch DJ and producer making Bass House and Tech House. Explore releases, DJ sets, playlists and upcoming shows."
 }

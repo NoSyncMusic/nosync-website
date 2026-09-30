@@ -1,59 +1,291 @@
-'use strict';
-const byId = id => document.getElementById(id);
-const labels = {SPOTIFY:'Spotify',APPLE_MUSIC:'Apple Music',YOUTUBE_MUSIC:'YouTube Music',DEEZER:'Deezer',BEATPORT:'Beatport',SOUNDCLOUD:'SoundCloud',AMAZON_MUSIC:'Amazon Music',ANGHAMMI:'Anghami',TIDAL:'Tidal',INSTAGRAM:'Instagram',YOUTUBE:'YouTube',TIKTOK:'TikTok',FACEBOOK:'Facebook',TWITTER:'X'};
-function node(tag, cls, text) { const el=document.createElement(tag); if(cls)el.className=cls; if(text!=null)el.textContent=text; return el; }
-function safeUrl(value, mail=false) {
-  if(typeof value!=='string'||!value.trim())return null;
-  try { const url=new URL(value,document.baseURI); return ['https:','http:',...(mail?['mailto:']:[])].includes(url.protocol)?url.href:null; } catch { return null; }
-}
-function link(text,url,cls) {const a=node('a',cls,text);const href=safeUrl(url);if(!href)return null;a.href=href;a.target='_blank';a.rel='noopener noreferrer';return a;}
-function image(src,alt,cls) {const img=node('img',cls);img.alt=alt;img.loading='lazy';const url=safeUrl(src);if(url)img.src=url;img.addEventListener('error',()=>{img.hidden=true;});return img;}
-function platforms(items,compact=false) {const box=node('div','platforms');(items||[]).forEach(item=>{const a=link(item.label||labels[item.type]||item.type,item.url,compact&&!['SPOTIFY','APPLE_MUSIC'].includes(item.type)?'other-platform':'');if(a)box.append(a);});return box;}
-function releaseCard(item,featured=false) {
-  const article=node('article',featured?'feature':'release');article.append(image(item.artwork,item.title+' artwork'));
-  const text=node('div');if(featured)text.append(node('p','eyebrow',item.badge||'FEATURED RELEASE'));
-  text.append(node('h3','',item.title),node('p','',item.artist));text.append(platforms(item.links,!featured));article.append(text);return article;
-}
-function applySettings(settings,data) {
-  const hero=settings.hero||{},nav=settings.navigation||{};
-  const text=(id,value)=>{if(typeof value==='string')byId(id).textContent=value;};
-  const vars={background:'--bg',text:'--text',headings:'--heading',secondary:'--muted',accent:'--accent',buttonText:'--button-text',surface:'--surface',borders:'--border'};
-  Object.entries(vars).forEach(([key,css])=>{const value=settings.colors?.[key];if(typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value))document.documentElement.style.setProperty(css,value);});
-  document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-  const artist=settings.artistName||'No Sync';byId('artist-photo').alt=artist;byId('artist-logo').alt=artist;document.querySelector('.wordmark').setAttribute('aria-label',artist+' home');
-  if(typeof settings.pageTitle==='string'&&settings.pageTitle.trim())document.title=settings.pageTitle;
-  text('footer-name',settings.footer?.name||artist.toUpperCase());text('back-to-top',settings.footer?.backToTop);
-  text('tagline',hero.tagline??data.tagline??'DJ / PRODUCER');text('genres',hero.genres??data.genres??'');
-  if(typeof hero.title==='string'&&hero.title.trim()) {
-    const heading=byId('artist-name');heading.replaceChildren();const lines=hero.title.split(/\r?\n/);
-    lines.forEach((line,index)=>{const span=node('span','title-line',line);if(index===lines.length-1&&hero.suffix)span.append(node('span','period',hero.suffix));heading.append(span);});
-    heading.setAttribute('aria-label',hero.title.replace(/\s+/g,' ').trim());
+(() => {
+  'use strict';
+  const byId = (id) => document.getElementById(id);
+  const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+  const rows = (value) => Array.isArray(value) ? value.filter(record) : [];
+  const words = (value, fallback = '') => typeof value === 'string' ? value : fallback;
+  const names = {
+    INSTAGRAM: 'Instagram', SPOTIFY: 'Spotify', YOUTUBE: 'YouTube', TIKTOK: 'TikTok',
+    FACEBOOK: 'Facebook', SOUNDCLOUD: 'SoundCloud', TWITTER: 'X', APPLE_MUSIC: 'Apple Music',
+    YOUTUBE_MUSIC: 'YouTube Music', DEEZER: 'Deezer', BEATPORT: 'Beatport',
+    AMAZON_MUSIC: 'Amazon Music', ANGHAMMI: 'Anghami', TIDAL: 'Tidal'
+  };
+  const order = ['SPOTIFY', 'APPLE_MUSIC', 'BEATPORT', 'SOUNDCLOUD', 'YOUTUBE_MUSIC'];
+
+  function node(tag, className, text) {
+    const result = document.createElement(tag);
+    if (className) result.className = className;
+    if (text !== undefined) result.textContent = text;
+    return result;
   }
-  text('hero-intro',hero.intro);byId('hero-intro').hidden=!hero.intro;
-  text('listen-button',hero.listenButton);text('booking-button',hero.bookingButton);text('photo-caption',hero.photoCaption);
-  const photo=safeUrl(hero.image||data.heroImage);if(photo)byId('artist-photo').src=photo;const logo=safeUrl(hero.logo||data.logo);if(logo)byId('artist-logo').src=logo;
-  [['music','nav-music'],['explore','nav-links'],['shows','nav-shows'],['contact','nav-contact']].forEach(([key,id])=>text(id,nav[key]));
-  for(const key of ['music','links','shows','contact']) {text(key+'-eyebrow',settings[key]?.eyebrow);text(key+'-title',settings[key]?.title);}
-  text('spotify-profile',settings.music?.spotifyLabel);text('bandsintown',settings.shows?.bandsintownLabel);text('presskit',settings.contact?.presskitLabel);
-}
-function render(data,settings={}) {
-  applySettings(settings,data);
-  (data.socials||[]).forEach(item=>{const a=link(item.label||labels[item.type]||item.type,item.url);if(a)byId('socials').append(a);});
-  const spotify=(data.socials||[]).find(x=>x.type==='SPOTIFY');if(spotify&&safeUrl(spotify.url))byId('spotify-profile').href=safeUrl(spotify.url);
-  const releases=(data.releases||[]).filter(x=>x.visible!==false);const featured=releases.find(x=>x.featured)||releases[0];
-  if(featured)byId('featured').append(releaseCard(featured,true));releases.filter(x=>x!==featured).forEach(item=>byId('releases').append(releaseCard(item)));
-  if(!releases.length)byId('music').hidden=true;
-  (data.links||[]).filter(x=>x.visible!==false).forEach(item=>{const a=link('',item.url,'link-card');if(!a)return;if(item.image)a.append(image(item.image,''));const box=node('div');box.append(node('h3','',item.title));if(item.subtitle)box.append(node('p','',item.subtitle));a.append(box);byId('link-grid').append(a);});
-  if(!byId('link-grid').children.length)byId('links').hidden=true;
-  const today=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Amsterdam'});
-  const shows=(data.shows||[]).filter(x=>x.visible!==false&&x.date&&x.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
-  shows.forEach(item=>{const row=node('article','show');const date=new Date(item.date+'T12:00:00Z');if(Number.isNaN(date.getTime()))return;const time=node('time','date',String(date.getUTCDate()).padStart(2,'0'));time.dateTime=item.date;time.append(node('small','',date.toLocaleDateString('en-GB',{month:'short',timeZone:'UTC'}).toUpperCase()+' '+date.getUTCFullYear()));row.append(time);const detail=node('div');detail.append(node('h3','',item.title||item.venue||settings.shows?.defaultTitle||'No Sync live'),node('p','',[item.venue,item.location].filter(Boolean).join(' · ')));row.append(detail);const ticket=safeUrl(item.ticketUrl);if(ticket){const a=link(item.soldOut?(settings.shows?.soldOutLabel||'Sold out'):(settings.shows?.ticketLabel||'Tickets'),ticket,'button');if(a)row.append(a);}else row.append(node('span','show-note',settings.shows?.moreInfoLabel??'More info soon'));byId('show-list').append(row);});
-  if(!shows.length)byId('show-list').append(node('p','empty',settings.shows?.emptyMessage??'New dates coming soon. Follow on Bandsintown for show updates.'));
-  if(safeUrl(data.bandsintown))byId('bandsintown').href=safeUrl(data.bandsintown);
-  (data.contacts||[]).forEach(item=>{if(typeof item.email!=='string'||!/^\S+@\S+\.\S+$/.test(item.email))return;const box=node('div');box.append(node('p','contact-label',item.label));const a=node('a','contact-email',item.email);a.href='mailto:'+item.email;box.append(a);if(item.note)box.append(node('p','contact-note',item.note));byId('contacts').append(box);});
-  const press=safeUrl(data.presskit);if(press){byId('presskit').href=press;byId('presskit').hidden=false;}
-  byId('year').textContent=String(new Date().getFullYear());
-}
-const content=fetch('content.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw new Error('Content unavailable');return response.json();});
-const settings=fetch('settings.json',{cache:'no-store'}).then(response=>response.ok?response.json():{}).catch(()=>({}));
-Promise.all([content,settings]).then(([data,config])=>render(data,config)).catch(()=>{byId('load-error').hidden=false;});
+  function setText(id, value) { byId(id).textContent = value; }
+  function webUrl(value) {
+    if (typeof value !== 'string' || /[\u0000-\u0020\u007f]/.test(value)) return '';
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
+    } catch { return ''; }
+  }
+  function imageUrl(value) {
+    if (typeof value !== 'string' || !value.trim() || /[\u0000-\u001f\u007f\\]/.test(value)) return '';
+    const path = value.trim().replace(/^\/media\//, 'media/');
+    try {
+      const url = new URL(path, document.baseURI);
+      const local = url.origin === location.origin && ['http:', 'https:'].includes(url.protocol);
+      return !url.username && !url.password && (local || url.protocol === 'https:') ? url.href : '';
+    } catch { return ''; }
+  }
+  function externalLink(url, text, className, accessibleName) {
+    const link = node('a', className, text);
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    if (accessibleName) link.setAttribute('aria-label', accessibleName);
+    return link;
+  }
+  function artwork(path) {
+    const img = node('img');
+    img.alt = '';
+    img.width = 640;
+    img.height = 640;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    const source = imageUrl(path);
+    if (source) img.src = source;
+    else img.hidden = true;
+    img.addEventListener('error', () => { img.hidden = true; });
+    return img;
+  }
+  function platformLabel(link) {
+    return words(link.label).trim() || names[link.type] || words(link.type, 'Listen').replaceAll('_', ' ');
+  }
+  function orderedLinks(value) {
+    const rank = (type) => order.includes(type) ? order.indexOf(type) : order.length;
+    return rows(value).map((link) => ({ ...link, url: webUrl(link.url) })).filter((link) => link.url)
+      .sort((a, b) => rank(a.type) - rank(b.type));
+  }
+  function platformButtons(links, title, featured, label) {
+    const group = node('div', 'platforms');
+    const primaryCount = featured ? 3 : 2;
+    const make = (link) => externalLink(link.url, platformLabel(link), 'platform-link', `${title} — ${platformLabel(link)}`);
+    links.slice(0, primaryCount).forEach((link) => group.append(make(link)));
+    if (links.length > primaryCount) {
+      const details = node('details', 'more-platforms');
+      details.append(node('summary', '', label));
+      const extra = node('div', 'extra-platforms');
+      links.slice(primaryCount).forEach((link) => extra.append(make(link)));
+      details.append(extra);
+      group.append(details);
+    }
+    return group;
+  }
+  function releaseCard(release, featured, settings) {
+    const card = node('article', featured ? 'featured-release' : 'release-card');
+    const links = orderedLinks(release.links);
+    const title = words(release.title, 'No Sync release');
+    const cover = links.length ? externalLink(links[0].url, undefined, 'release-art', `Listen to ${title}`) : node('div', 'release-art');
+    cover.append(artwork(release.artwork));
+    const body = node('div', 'release-body');
+    if (featured && words(release.badge).trim()) body.append(node('p', 'release-badge', release.badge));
+    body.append(node('h3', '', title), node('p', 'release-artist', words(release.artist)));
+    body.append(platformButtons(links, title, featured, settings.music.morePlatformsLabel));
+    card.append(cover, body);
+    return card;
+  }
+  function hex(value) {
+    const match = words(value).trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (!match) return '';
+    const digits = match[1].length === 3 ? [...match[1]].map((x) => x + x).join('') : match[1];
+    return `#${digits.toUpperCase()}`;
+  }
+  function channels(color) { return [1, 3, 5].map((start) => parseInt(color.slice(start, start + 2), 16)); }
+  function luminance(color) {
+    const rgb = channels(color).map((v) => { const s = v / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; });
+    return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+  }
+  function contrast(a, b) { const x = luminance(a); const y = luminance(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function blend(color, target, amount) {
+    return '#' + channels(color).map((value, i) => Math.round(value + (channels(target)[i] - value) * amount).toString(16).padStart(2, '0')).join('');
+  }
+  function readableAccent(color, background, surface) {
+    const score = (candidate) => Math.min(contrast(candidate, background), contrast(candidate, surface));
+    let best = color;
+    for (let step = 0; step <= 40; step++) {
+      for (const target of ['#FFFFFF', '#000000']) {
+        const candidate = blend(color, target, step / 40);
+        if (score(candidate) >= 4.5) return candidate;
+        if (score(candidate) > score(best)) best = candidate;
+      }
+    }
+    return best;
+  }
+  function mergeSettings(source, defaults) {
+    const input = record(source) ? source : {};
+    const result = {};
+    Object.entries(defaults).forEach(([key, fallback]) => {
+      result[key] = record(fallback) ? mergeSettings(input[key], fallback) : words(input[key], fallback);
+    });
+    return result;
+  }
+  function visibility(section, visible) {
+    byId(section).hidden = !visible;
+    byId(`nav-${section}`).hidden = !visible;
+  }
+  function applySettings(settings) {
+    const colors = {};
+    Object.keys(snapshot.settings.colors).forEach((name) => {
+      colors[name] = hex(settings.colors[name]) || snapshot.settings.colors[name];
+      document.documentElement.style.setProperty(`--${name}`, colors[name]);
+    });
+    document.documentElement.style.setProperty('--accent-ink', readableAccent(colors.accent, colors.background, colors.surface));
+    if (contrast(colors.buttonText, colors.accent) < 4.5) {
+      const ink = contrast('#000000', colors.accent) >= contrast('#FFFFFF', colors.accent) ? '#000000' : '#FFFFFF';
+      document.documentElement.style.setProperty('--buttonText', ink);
+    }
+    document.querySelector('meta[name="theme-color"]').content = colors.background;
+    document.title = settings.pageTitle;
+    document.querySelector('meta[name="description"]').content = settings.description;
+    document.querySelector('meta[property="og:title"]').content = settings.pageTitle;
+    document.querySelector('meta[property="og:description"]').content = settings.description;
+    const title = settings.hero.title.replace(/\\n/g, '\n');
+    const lines = title.split('\n').filter((line) => line.trim());
+    byId('artist-name').replaceChildren(...(lines.length ? lines : [settings.artistName]).map((line) => node('span', 'title-line', line)));
+    if (settings.hero.suffix) byId('artist-name').append(node('span', 'title-suffix', settings.hero.suffix));
+    byId('artist-name').setAttribute('aria-label', `${lines.join(' ') || settings.artistName}${settings.hero.suffix}`);
+    setText('tagline', settings.hero.tagline);
+    setText('genres', settings.hero.genres);
+    setText('hero-intro', settings.hero.intro);
+    byId('hero-intro').hidden = !settings.hero.intro.trim();
+    setText('photo-caption', settings.hero.photoCaption);
+    byId('photo-caption').hidden = !settings.hero.photoCaption.trim();
+    for (const [id, value] of [['artist-photo', settings.hero.image], ['artist-logo', settings.hero.logo]]) {
+      const img = byId(id);
+      const source = imageUrl(value);
+      img.hidden = !source;
+      img.onerror = () => { img.hidden = true; };
+      if (source) img.src = source;
+    }
+    byId('artist-photo').alt = `${settings.artistName}, DJ and producer`;
+    byId('artist-logo').alt = settings.artistName;
+    byId('home-link').setAttribute('aria-label', `${settings.artistName} — home`);
+    for (const [id, value] of Object.entries({
+      'listen-button': settings.hero.listenButton, 'booking-button': settings.hero.bookingButton,
+      'nav-music': settings.navigation.music, 'nav-links': settings.navigation.explore,
+      'nav-shows': settings.navigation.shows, 'nav-contact': settings.navigation.contact,
+      'music-eyebrow': settings.music.eyebrow, 'music-title': settings.music.title, 'spotify-profile': settings.music.spotifyLabel,
+      'links-eyebrow': settings.links.eyebrow, 'links-title': settings.links.title,
+      'shows-eyebrow': settings.shows.eyebrow, 'shows-title': settings.shows.title, 'bandsintown': settings.shows.bandsintownLabel,
+      'contact-eyebrow': settings.contact.eyebrow, 'contact-title': settings.contact.title, 'presskit': settings.contact.presskitLabel,
+      'footer-name': settings.footer.name, 'back-to-top': settings.footer.backToTop
+    })) setText(id, value);
+    setText('year', String(new Date().getFullYear()));
+  }
+  function validDate(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const date = new Date(`${value}T12:00:00Z`);
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null;
+  }
+  function todayInAmsterdam() {
+    const parts = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+    const part = (type) => parts.find((entry) => entry.type === type).value;
+    return `${part('year')}-${part('month')}-${part('day')}`;
+  }
+  function renderShows(content, settings) {
+    const list = byId('show-list');
+    list.replaceChildren();
+    const today = todayInAmsterdam();
+    const shows = rows(content.shows).filter((show) => show.visible !== false && validDate(show.date) && show.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    shows.forEach((show) => {
+      const row = node('article', 'show-row');
+      const date = validDate(show.date);
+      const time = node('time', 'show-date');
+      time.dateTime = show.date;
+      time.append(node('span', 'show-day', String(date.getUTCDate()).padStart(2, '0')),
+        node('span', 'show-month', new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date)));
+      const body = node('div', 'show-body');
+      const title = words(show.title).trim();
+      const displayTitle = !title || /^tba$/i.test(title) ? settings.shows.defaultTitle : title;
+      body.append(node('h3', '', displayTitle));
+      const venue = words(show.venue).trim();
+      body.append(node('p', '', !venue || /^tba$/i.test(venue) ? settings.shows.venuePendingLabel : venue));
+      if (words(show.location).trim()) body.append(node('p', 'show-location', show.location));
+      const ticket = webUrl(show.ticketUrl);
+      const action = show.soldOut ? node('p', 'show-status', settings.shows.soldOutLabel)
+        : ticket ? externalLink(ticket, settings.shows.ticketLabel, 'button button-outline', `Tickets — ${displayTitle}`)
+          : node('p', 'show-status', settings.shows.moreInfoLabel);
+      row.append(time, body, action);
+      list.append(row);
+    });
+    if (!shows.length) list.append(node('p', 'empty-message', settings.shows.emptyMessage));
+  }
+  function updateExternal(id, value) {
+    const url = webUrl(value);
+    byId(id).hidden = !url;
+    if (url) byId(id).href = url;
+  }
+  function render(content, settings) {
+    applySettings(settings);
+    byId('socials').replaceChildren();
+    rows(content.socials).forEach((social) => {
+      const url = webUrl(social.url);
+      if (url) byId('socials').append(externalLink(url, platformLabel(social), 'social-link'));
+    });
+    const spotify = rows(content.socials).find((social) => social.type === 'SPOTIFY' && webUrl(social.url));
+    updateExternal('spotify-profile', spotify?.url);
+    const releases = rows(content.releases).filter((release) => release.visible !== false);
+    const featured = releases.find((release) => release.featured) || releases[0];
+    byId('featured').replaceChildren();
+    byId('releases').replaceChildren();
+    if (featured) byId('featured').append(releaseCard(featured, true, settings));
+    releases.filter((release) => release !== featured).forEach((release) => byId('releases').append(releaseCard(release, false, settings)));
+    visibility('music', releases.length > 0);
+    byId('listen-button').hidden = !releases.length;
+    byId('link-grid').replaceChildren();
+    rows(content.links).filter((link) => link.visible !== false && webUrl(link.url)).forEach((link) => {
+      const card = externalLink(webUrl(link.url), undefined, 'link-card');
+      const image = node('span', 'link-art');
+      image.append(artwork(link.image));
+      const body = node('span', 'link-body');
+      body.append(node('span', 'link-title', words(link.title, 'Explore')));
+      if (words(link.subtitle).trim()) body.append(node('span', 'link-subtitle', link.subtitle));
+      const arrow = node('span', 'link-arrow', '↗');
+      arrow.setAttribute('aria-hidden', 'true');
+      card.append(image, body, arrow);
+      byId('link-grid').append(card);
+    });
+    visibility('links', byId('link-grid').childElementCount > 0);
+    renderShows(content, settings);
+    updateExternal('bandsintown', content.bandsintown);
+    updateExternal('presskit', content.presskit);
+    byId('contacts').replaceChildren();
+    rows(content.contacts).forEach((contact) => {
+      const email = words(contact.email).trim();
+      if (!/^[^\s<>@?&]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) return;
+      const item = node('div', 'contact-card');
+      item.append(node('p', 'contact-label', words(contact.label)));
+      const address = node('a', 'contact-email', email);
+      address.href = `mailto:${email}`;
+      item.append(address);
+      if (words(contact.note).trim()) item.append(node('p', 'contact-note', contact.note));
+      byId('contacts').append(item);
+    });
+  }
+  async function freshJson(path) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const response = await fetch(`${path}?v=${Date.now()}`, { cache: 'no-store', signal: controller.signal });
+      if (!response.ok) throw new Error('Unavailable');
+      const value = await response.json();
+      if (!record(value)) throw new Error('Invalid data');
+      return value;
+    } finally { clearTimeout(timeout); }
+  }
+  const snapshot = JSON.parse(byId('published-data').textContent);
+  applySettings(snapshot.settings);
+  Promise.allSettled([freshJson('content.json'), freshJson('settings.json')]).then(([content, settings]) => {
+    render(content.status === 'fulfilled' ? content.value : snapshot.content,
+      mergeSettings(settings.status === 'fulfilled' ? settings.value : {}, snapshot.settings));
+  });
+})();
