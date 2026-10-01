@@ -145,6 +145,12 @@ content:
       label: Kop
       type: string
       required: true
+    - name: primaryLabel
+      label: Label boven fanlinks
+      type: string
+    - name: secondaryLabel
+      label: Label boven links voor artiesten
+      type: string
   - name: shows
     label: Showsectie
     type: object
@@ -316,6 +322,18 @@ content:
     - name: label
       label: Eigen tekst voor deze link (optioneel)
       type: string
+  - name: highlights
+    label: Korte highlights onder de hero
+    type: object
+    list: true
+    description: Maximaal drie korte punten worden als rustige credibility-strip onder de hero getoond.
+    fields:
+    - name: value
+      label: Hoofdtekst
+      type: string
+    - name: label
+      label: Kleine toelichting
+      type: string
   - name: upcomingReleases
     label: Aankomende releases
     type: object
@@ -325,7 +343,7 @@ content:
     - name: slug
       label: URL-naam
       type: string
-      description: Alleen kleine letters, cijfers en streepjes. Bijvoorbeeld push. De pre-save opent via /presave/?release=push.
+      description: Alleen kleine letters, cijfers en streepjes. Bijvoorbeeld push. De pre-save opent via /presave/push/.
       pattern:
         regex: ^[a-z0-9]+(?:-[a-z0-9]+)*$
         message: Gebruik alleen kleine letters, cijfers en streepjes.
@@ -528,6 +546,17 @@ content:
     - name: image
       label: Afbeelding
       type: image
+    - name: category
+      label: Categorie
+      type: select
+      options:
+        values:
+        - DJ_SET
+        - PLAYLIST
+        - FREE_DOWNLOAD
+        - FOR_ARTISTS
+        - MUSIC
+      description: FOR_ARTISTS wordt apart onder 'For artists' geplaatst; de overige categorieën blijven bij de fanlinks.
     - name: visible
       label: Zichtbaar
       type: boolean
