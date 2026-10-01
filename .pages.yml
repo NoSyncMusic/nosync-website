@@ -535,7 +535,7 @@ content:
         type: string
         description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
   - name: links
-    label: Explore: sets, playlists & downloads
+    label: "Explore: sets, playlists & downloads"
     type: object
     list:
       collapsible:
