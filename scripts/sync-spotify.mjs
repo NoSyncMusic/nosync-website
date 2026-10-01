@@ -88,6 +88,13 @@ for (const upcoming of data.upcomingReleases) {
     for (const release of data.releases) release.featured = false;
   }
 
+  const existingLinks = Array.isArray(existing?.links) ? existing.links.filter((link) => link && typeof link === 'object') : [];
+  const links = existingLinks.filter((link) => !['SPOTIFY', 'SMART_LINK'].includes(link.type));
+  if (upcoming.smartLinkUrl || upcoming.presaveUrl) {
+    links.unshift({ type: 'SMART_LINK', url: upcoming.smartLinkUrl || upcoming.presaveUrl, label: 'All platforms' });
+  }
+  links.push({ type: 'SPOTIFY', url: spotifyUrl });
+
   const releaseData = {
     isrc,
     spotifyTrackId: track.id,
@@ -98,7 +105,8 @@ for (const upcoming of data.upcomingReleases) {
     featured: Boolean(upcoming.featured),
     badge: 'OUT NOW',
     visible: true,
-    links: [{ type: 'SPOTIFY', url: spotifyUrl }]
+    smartLinkUrl: upcoming.smartLinkUrl || upcoming.presaveUrl || '',
+    links
   };
 
   if (existing) Object.assign(existing, releaseData);
