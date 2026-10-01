@@ -22,13 +22,15 @@
   "music": {
     "eyebrow": "TURN IT UP",
     "title": "Releases.",
-    "spotifyLabel": "More on Spotify",
     "morePlatformsLabel": "More platforms",
     "streamHereLabel": "Stream here",
     "streamModalTitle": "Choose your platform",
     "streamModalEyebrow": "LISTEN NOW",
     "openPlatformLabel": "Open ↗",
-    "closeModalLabel": "Close"
+    "closeModalLabel": "Close",
+    "allReleasesLabel": "All releases",
+    "allReleasesEyebrow": "DISCOGRAPHY",
+    "allReleasesTitle": "All releases."
   },
   "links": {
     "eyebrow": "BEYOND THE RELEASES",
