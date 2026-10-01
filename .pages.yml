@@ -443,6 +443,7 @@ content:
           - AUDIOMACK
           - ANGHAMMI
           - TIDAL
+          - OTHER
       - name: url
         label: Link
         type: string
@@ -450,6 +451,7 @@ content:
       - name: label
         label: Eigen tekst voor deze link (optioneel)
         type: string
+        description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
   - name: releases
     label: Releases
     type: object
@@ -499,6 +501,7 @@ content:
           - AUDIOMACK
           - ANGHAMMI
           - TIDAL
+          - OTHER
       - name: url
         label: Link
         type: string
@@ -506,6 +509,7 @@ content:
       - name: label
         label: Eigen tekst voor deze link (optioneel)
         type: string
+        description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
   - name: links
     label: Sets, playlists en overige links
     type: object
