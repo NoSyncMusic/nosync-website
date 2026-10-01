@@ -88,8 +88,20 @@ content:
     - name: spotifyLabel
       label: Tekst Spotify-link
       type: string
-    - name: morePlatformsLabel
-      label: Tekst voor overige luisterplatforms
+    - name: streamHereLabel
+      label: Tekst Stream Here-knop
+      type: string
+    - name: streamModalTitle
+      label: Tekst boven streamingdiensten in popup
+      type: string
+    - name: streamModalEyebrow
+      label: Kleine tekst bovenaan streamingpopup
+      type: string
+    - name: openPlatformLabel
+      label: Tekst rechts naast iedere streamingdienst
+      type: string
+    - name: closeModalLabel
+      label: Toegankelijk label sluitknop
       type: string
   - name: upcoming
     label: Aankomende release
@@ -403,6 +415,34 @@ content:
     - name: spotifyReleaseDate
       label: Automatisch - Spotify releasedatum
       type: string
+    - name: links
+      label: Luisterlinks na release (optioneel)
+      type: object
+      list: true
+      description: Optioneel. Voeg directe streaminglinks toe; na de releasedatum verschijnen ze automatisch in de Stream Here-popup. De smartlink en Spotify-link blijven als fallback beschikbaar.
+      fields:
+      - name: type
+        label: Platform
+        type: select
+        options:
+          values:
+          - SMART_LINK
+          - SPOTIFY
+          - APPLE_MUSIC
+          - YOUTUBE_MUSIC
+          - DEEZER
+          - BEATPORT
+          - SOUNDCLOUD
+          - AMAZON_MUSIC
+          - ANGHAMMI
+          - TIDAL
+      - name: url
+        label: Link
+        type: string
+        description: Gebruik de volledige https://-link.
+      - name: label
+        label: Eigen tekst voor deze link (optioneel)
+        type: string
   - name: releases
     label: Releases
     type: object
