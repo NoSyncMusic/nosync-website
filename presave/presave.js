@@ -3,6 +3,28 @@
 
   const byId = (id) => document.getElementById(id);
   const words = (value, fallback = '') => typeof value === 'string' ? value : fallback;
+  const serviceNames = {
+    SPOTIFY: 'Spotify',
+    APPLE_MUSIC: 'Apple Music',
+    AMAZON_MUSIC: 'Amazon Music',
+    YOUTUBE_MUSIC: 'YouTube Music',
+    DEEZER: 'Deezer',
+    TIDAL: 'TIDAL',
+    SOUNDCLOUD: 'SoundCloud',
+    AUDIOMACK: 'Audiomack',
+    ANGHAMMI: 'Anghami'
+  };
+  const defaultServices = Object.keys(serviceNames);
+
+  function siteRoot() {
+    const marker = '/presave/';
+    const i = location.pathname.indexOf(marker);
+    if (i >= 0) return location.pathname.slice(0, i + 1);
+    return location.pathname.replace(/[^/]*$/, '');
+  }
+
+  const root = siteRoot();
+
   const webUrl = (value) => {
     if (typeof value !== 'string') return '';
     try {
@@ -10,13 +32,17 @@
       return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
     } catch { return ''; }
   };
+
   const imageUrl = (value) => {
     if (typeof value !== 'string' || !value.trim()) return '';
     try {
-      const url = new URL(value.trim().replace(/^\/media\//, '../media/'), document.baseURI);
-      return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+      const raw = value.trim();
+      if (/^https:\/\//i.test(raw)) return webUrl(raw);
+      const clean = raw.replace(/^\/?/, '');
+      return new URL(root + clean, location.origin).href;
     } catch { return ''; }
   };
+
   const slugify = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   function todayInAmsterdam() {
@@ -38,8 +64,8 @@
     return Math.max(0, Math.ceil((target - today) / 86400000));
   }
 
-  async function json(path) {
-    const response = await fetch(`${path}?v=${Date.now()}`, { cache: 'no-store' });
+  async function json(filename) {
+    const response = await fetch(`${root}${filename}?v=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('Could not load release data');
     return response.json();
   }
@@ -53,28 +79,77 @@
     }
   }
 
+  function requestedSlug() {
+    const query = new URLSearchParams(location.search).get('release');
+    if (query) return query;
+    const meta = document.querySelector('meta[name="presave-release"]')?.content;
+    if (meta) return meta;
+    const parts = location.pathname.split('/').filter(Boolean);
+    const index = parts.lastIndexOf('presave');
+    return index >= 0 ? words(parts[index + 1]) : '';
+  }
+
+  function renderServices(release, settings, released) {
+    const services = Array.isArray(release.enabledServices) && release.enabledServices.length
+      ? release.enabledServices.filter((item) => serviceNames[item])
+      : defaultServices;
+    const follows = new Set(Array.isArray(release.followServices) ? release.followServices : []);
+    const host = byId('presave-services');
+    host.replaceChildren();
+
+    services.forEach((service) => {
+      const item = document.createElement('span');
+      item.className = 'presave-service';
+      const name = document.createElement('span');
+      name.className = 'presave-service-name';
+      name.textContent = serviceNames[service];
+      item.append(name);
+      if (!released && follows.has(service)) {
+        const badge = document.createElement('span');
+        badge.className = 'presave-follow-badge';
+        badge.textContent = settings?.upcoming?.followLabel || 'Follow supported';
+        item.append(badge);
+      }
+      host.append(item);
+    });
+
+    byId('presave-services-label').textContent = released ? 'Available on your streaming services' : (settings?.upcoming?.servicesLabel || 'Pre-save available on');
+    byId('presave-services-wrap').hidden = !services.length;
+  }
+
   async function init() {
     try {
-      const [content, settings] = await Promise.all([json('../content.json'), json('../settings.json')]);
+      const [content, settings] = await Promise.all([json('content.json'), json('settings.json')]);
       applyColors(settings);
-      const requested = new URLSearchParams(location.search).get('release') || '';
+      byId('presave-back').href = root || '/';
+
+      const requested = requestedSlug();
       const releases = Array.isArray(content.upcomingReleases) ? content.upcomingReleases : [];
       const release = releases.find((item) => item && item.visible !== false && (words(item.slug) === requested || slugify(item.title) === requested));
       if (!release) throw new Error('This pre-save is not available.');
 
-      const released = words(release.status, 'upcoming') === 'released' && webUrl(release.spotifyUrl);
+      const released = words(release.status, 'upcoming') === 'released';
       const title = words(release.spotifyTitle, words(release.title, 'New release'));
       const artist = words(release.spotifyArtist, words(release.artist, 'No Sync'));
-      const actionUrl = released ? webUrl(release.spotifyUrl) : webUrl(release.presaveUrl);
+      const smartLink = webUrl(release.smartLinkUrl) || webUrl(release.presaveUrl);
+      const actionUrl = smartLink || (released ? webUrl(release.spotifyUrl) : '');
       const artwork = imageUrl(release.spotifyArtwork || release.artwork);
 
       document.title = `${title} — No Sync`;
+      document.querySelector('meta[name="description"]').content = released
+        ? `Listen to ${title} by ${artist} on your preferred streaming service.`
+        : `Pre-save ${title} by ${artist} on your preferred streaming service.`;
+
       byId('presave-title').textContent = title;
       byId('presave-artist').textContent = artist;
       byId('presave-eyebrow').textContent = released ? 'OUT NOW' : 'COMING SOON';
 
-      if (artwork) byId('presave-art').src = artwork;
-      else byId('presave-art').hidden = true;
+      if (artwork) {
+        byId('presave-art').src = artwork;
+        byId('presave-art').alt = `${title} artwork`;
+      } else {
+        byId('presave-art').hidden = true;
+      }
 
       const date = validDate(release.releaseDate);
       if (date) {
@@ -84,7 +159,7 @@
       }
 
       const button = byId('presave-action');
-      button.textContent = released ? (settings?.upcoming?.releasedLabel || 'Listen on Spotify') : (settings?.upcoming?.presaveLabel || 'Pre-save on Spotify');
+      button.textContent = released ? (settings?.upcoming?.releasedLabel || 'Listen on all platforms') : (settings?.upcoming?.presaveLabel || 'Choose your platform');
       if (actionUrl) {
         button.href = actionUrl;
         button.target = '_blank';
@@ -92,8 +167,10 @@
         button.hidden = true;
       }
 
+      renderServices(release, settings, released);
+
       const note = byId('presave-note');
-      if (!released && release.followArtist && words(settings?.upcoming?.followNote).trim()) {
+      if (!released && words(settings?.upcoming?.followNote).trim()) {
         note.textContent = settings.upcoming.followNote;
         note.hidden = false;
       }
