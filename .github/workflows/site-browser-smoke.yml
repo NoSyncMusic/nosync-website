@@ -1,0 +1,56 @@
+name: Site browser smoke tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "index.html"
+      - "script.js"
+      - "styles.css"
+      - "content.json"
+      - "settings.json"
+      - "releases/**"
+      - "presave/**"
+      - ".github/site-tests/**"
+      - ".github/workflows/site-browser-smoke.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-browser-smoke
+  cancel-in-progress: true
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium firefox webkit
+
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/nosync-site.log 2>&1 &
+          echo $! > /tmp/nosync-site.pid
+          for i in {1..20}; do
+            curl --fail --silent http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/nosync-site.log
+          exit 1
+
+      - name: Run browser matrix
+        run: node .github/site-tests/smoke.mjs
