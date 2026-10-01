@@ -299,33 +299,6 @@ content:
   path: content.json
   format: json
   fields:
-  - name: socials
-    label: Socials
-    type: object
-    list:
-      collapsible:
-        collapsed: true
-        summary: "{type}"
-    fields:
-    - name: type
-      label: Platform
-      type: select
-      options:
-        values:
-        - INSTAGRAM
-        - SPOTIFY
-        - YOUTUBE
-        - TIKTOK
-        - FACEBOOK
-        - SOUNDCLOUD
-        - TWITTER
-    - name: url
-      label: Link
-      type: string
-      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
-    - name: label
-      label: Eigen tekst voor deze link (optioneel)
-      type: string
   - name: stats
     label: Statistieken onder de hero
     type: object
@@ -629,6 +602,33 @@ content:
       type: boolean
     description: Gebruikt als reserve als Bandsintown leeg of onbereikbaar is, of wanneer Homepage & kleuren → Showsectie → Shows automatisch laden op
       manual staat. Bij bandsintown beheer je je optredens in Bandsintown for Artists.
+  - name: socials
+    label: Socials
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{type}"
+    fields:
+    - name: type
+      label: Platform
+      type: select
+      options:
+        values:
+        - INSTAGRAM
+        - SPOTIFY
+        - YOUTUBE
+        - TIKTOK
+        - FACEBOOK
+        - SOUNDCLOUD
+        - TWITTER
+    - name: url
+      label: Link
+      type: string
+      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
+    - name: label
+      label: Eigen tekst voor deze link (optioneel)
+      type: string
   - name: bandsintown
     label: Bandsintown-link
     type: string
