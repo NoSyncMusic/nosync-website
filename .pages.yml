@@ -116,9 +116,6 @@ content:
     - name: servicesLabel
       label: Tekst boven streamingdiensten
       type: string
-    - name: followLabel
-      label: Tekst voor follow-ondersteuning
-      type: string
   - name: links
     label: Sectie met sets en playlists
     type: object
