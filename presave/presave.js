@@ -93,7 +93,6 @@
     const services = Array.isArray(release.enabledServices) && release.enabledServices.length
       ? release.enabledServices.filter((item) => serviceNames[item])
       : defaultServices;
-    const follows = new Set(Array.isArray(release.followServices) ? release.followServices : []);
     const host = byId('presave-services');
     host.replaceChildren();
 
@@ -104,12 +103,6 @@
       name.className = 'presave-service-name';
       name.textContent = serviceNames[service];
       item.append(name);
-      if (!released && follows.has(service)) {
-        const badge = document.createElement('span');
-        badge.className = 'presave-follow-badge';
-        badge.textContent = settings?.upcoming?.followLabel || 'Follow supported';
-        item.append(badge);
-      }
       host.append(item);
     });
 
