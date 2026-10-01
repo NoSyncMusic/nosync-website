@@ -12,7 +12,7 @@
   };
   const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT', 'OTHER'];
   const STREAM_MODAL_ANIMATION_MS = 260;
-  const RELEASE_VIEW_STORAGE_KEY = 'nosync-release-view';
+  const RELEASE_VIEW_STORAGE_KEY = 'nosync-release-view-v2';
   let streamModalReturnFocus = null;
   let streamModalCloseTimer = null;
   let streamModalScrollY = 0;
@@ -400,9 +400,9 @@
   function storedReleaseView() {
     try {
       const value = localStorage.getItem(RELEASE_VIEW_STORAGE_KEY);
-      return value === 'grid' || value === 'year' ? value : 'year';
+      return value === 'grid' || value === 'year' ? value : 'grid';
     } catch {
-      return 'year';
+      return 'grid';
     }
   }
 
