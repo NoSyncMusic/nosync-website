@@ -66,9 +66,11 @@
   "upcoming": {
     "eyebrow": "COMING SOON",
     "title": "Next release.",
-    "presaveLabel": "Pre-save on Spotify",
-    "releasedLabel": "Listen on Spotify",
-    "followNote": "Spotify may ask for permission to save the release and follow No Sync.",
-    "countdownLabel": "until release"
+    "presaveLabel": "Choose your platform",
+    "releasedLabel": "Listen on all platforms",
+    "followNote": "Pre-save on your preferred service. Follow actions are offered by the connected provider where that service supports them.",
+    "countdownLabel": "until release",
+    "servicesLabel": "Pre-save available on",
+    "followLabel": "Follow supported"
   }
 }

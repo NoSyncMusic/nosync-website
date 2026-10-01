@@ -8,9 +8,9 @@
     INSTAGRAM: 'Instagram', SPOTIFY: 'Spotify', YOUTUBE: 'YouTube', TIKTOK: 'TikTok',
     FACEBOOK: 'Facebook', SOUNDCLOUD: 'SoundCloud', TWITTER: 'X', APPLE_MUSIC: 'Apple Music',
     YOUTUBE_MUSIC: 'YouTube Music', DEEZER: 'Deezer', BEATPORT: 'Beatport',
-    AMAZON_MUSIC: 'Amazon Music', ANGHAMMI: 'Anghami', TIDAL: 'Tidal'
+    AMAZON_MUSIC: 'Amazon Music', ANGHAMMI: 'Anghami', TIDAL: 'Tidal', AUDIOMACK: 'Audiomack', SMART_LINK: 'All platforms'
   };
-  const order = ['SPOTIFY', 'APPLE_MUSIC', 'BEATPORT', 'SOUNDCLOUD', 'YOUTUBE_MUSIC'];
+  const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT'];
 
   function node(tag, className, text) {
     const result = document.createElement(tag);
@@ -338,10 +338,12 @@
   snapshot.settings.upcoming = snapshot.settings.upcoming || {
     eyebrow: 'COMING SOON',
     title: 'Next release.',
-    presaveLabel: 'Pre-save on Spotify',
-    releasedLabel: 'Listen on Spotify',
-    followNote: 'Spotify may ask for permission to save the release and follow No Sync.',
-    countdownLabel: 'until release'
+    presaveLabel: 'Choose your platform',
+    releasedLabel: 'Listen on all platforms',
+    followNote: 'Pre-save on your preferred service. Follow actions are offered by the connected provider where supported.',
+    countdownLabel: 'until release',
+    servicesLabel: 'Pre-save available on',
+    followLabel: 'Follow supported'
   };
   applySettings(snapshot.settings);
   Promise.allSettled([freshJson('content.json'), freshJson('settings.json')]).then(([content, settings]) => {

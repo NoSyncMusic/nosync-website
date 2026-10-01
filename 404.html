@@ -2,23 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>No Sync</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#101010">
+  <title>404 — No Sync</title>
+  <script>
+    document.write('<base href="' + (location.hostname.endsWith('github.io') ? '/nosync-website/' : '/') + '">');
+  </script>
+  <link rel="icon" href="media/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=20261001-utility-1">
 </head>
 <body>
-  <script>
-    (() => {
-      const parts = location.pathname.split('/').filter(Boolean);
-      const index = parts.lastIndexOf('presave');
-      const slug = index >= 0 ? parts[index + 1] : '';
-      if (slug && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-        const base = location.pathname.slice(0, location.pathname.indexOf('/presave/') + 9);
-        location.replace(base + '?release=' + encodeURIComponent(slug));
-        return;
-      }
-      location.replace('/');
-    })();
-  </script>
+  <main class="utility-page">
+    <div class="utility-shell">
+      <img class="utility-logo" src="media/logo.webp" alt="No Sync">
+      <p class="utility-code">404 / SIGNAL LOST</p>
+      <h1 class="utility-title">WRONG<br>DROP.</h1>
+      <p class="utility-copy">This page doesn't exist, moved somewhere else, or got lost between the beats.</p>
+      <div class="utility-actions">
+        <a class="button button-accent" href="./">Back to No Sync</a>
+        <a class="button button-outline" href="./#music">Listen to music</a>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="index,follow">
   <meta name="theme-color" content="#101010">
-  <meta name="description" content="Pre-save the next No Sync release on Spotify.">
+  <meta name="description" content="Pre-save the next No Sync release on your preferred streaming service.">
   <title>No Sync — Pre-save</title>
   <link rel="icon" href="../media/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../styles.css?v=20261001-presave-1">
-  <script src="presave.js?v=20261001-1" defer></script>
+  <link rel="stylesheet" href="../styles.css?v=20261001-multiplatform-1">
+  <script src="presave.js?v=20261001-multiplatform-1" defer></script>
 </head>
 <body>
   <main class="presave-page">
     <div class="presave-shell">
-      <a class="presave-back" href="../">← Back to No Sync</a>
+      <a class="presave-back" id="presave-back" href="../">← Back to No Sync</a>
       <article class="presave-card" id="presave-card" hidden>
         <div class="presave-card-inner">
           <div class="presave-art"><img id="presave-art" alt="" width="900" height="900"></div>
@@ -25,7 +25,11 @@
             <p class="presave-date" id="presave-date"></p>
             <p class="presave-countdown" id="presave-countdown"></p>
             <div class="presave-actions">
-              <a id="presave-action" class="button button-accent" href="#" rel="noopener noreferrer">Pre-save on Spotify</a>
+              <a id="presave-action" class="button button-accent" href="#" rel="noopener noreferrer">Choose your platform</a>
+            </div>
+            <div id="presave-services-wrap" class="presave-services-wrap" hidden>
+              <p id="presave-services-label" class="presave-services-label">Pre-save available on</p>
+              <div id="presave-services" class="presave-services"></div>
             </div>
             <p class="presave-note" id="presave-note" hidden></p>
           </div>
