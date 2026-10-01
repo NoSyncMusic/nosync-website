@@ -79,6 +79,7 @@
   let streamModalCloseTimer = null;
   let streamModalScrollY = 0;
   let streamModalBodyStyle = null;
+  let streamModalViewportSyncFrame = 0;
 
   function uniqueLinks(value) {
     const seen = new Set();
@@ -120,13 +121,17 @@
   }
 
   function syncStreamModalViewport() {
-    updateStreamModalViewport();
-    requestAnimationFrame(() => {
+    cancelAnimationFrame(streamModalViewportSyncFrame);
+    const deadline = performance.now() + 600;
+    const tick = () => {
       updateStreamModalViewport();
-      requestAnimationFrame(updateStreamModalViewport);
-    });
-    window.setTimeout(updateStreamModalViewport, 80);
-    window.setTimeout(updateStreamModalViewport, 220);
+      if (performance.now() < deadline) {
+        streamModalViewportSyncFrame = requestAnimationFrame(tick);
+      } else {
+        streamModalViewportSyncFrame = 0;
+      }
+    };
+    tick();
   }
 
   function lockPageScroll() {
@@ -285,12 +290,9 @@
     setModalBackgroundInert(modal, true);
     modal.hidden = false;
     document.body.classList.add('stream-modal-open');
-    syncStreamModalViewport();
     safeFocus(close);
-    requestAnimationFrame(() => {
-      syncStreamModalViewport();
-      modal.classList.add('is-open');
-    });
+    syncStreamModalViewport();
+    requestAnimationFrame(() => modal.classList.add('is-open'));
   }
 
   function releaseCard(release, featured, settings) {
