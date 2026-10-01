@@ -1,0 +1,47 @@
+name: Generate pre-save pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "content.json"
+      - "settings.json"
+      - "presave/index.html"
+      - "presave/presave.js"
+      - "scripts/generate-presave-pages.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-presave-pages
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate release pages
+        run: node scripts/generate-presave-pages.mjs
+
+      - name: Commit generated pages
+        run: |
+          if git diff --quiet -- presave; then
+            echo "No generated page changes."
+            exit 0
+          fi
+          git config user.name "No Sync Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add presave
+          git commit -m "Generate pre-save pages"
+          git push
