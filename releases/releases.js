@@ -167,6 +167,16 @@
     modal.style.setProperty('--modal-vv-height', `${viewport.height}px`);
   }
 
+  function syncStreamModalViewport() {
+    updateStreamModalViewport();
+    requestAnimationFrame(() => {
+      updateStreamModalViewport();
+      requestAnimationFrame(updateStreamModalViewport);
+    });
+    window.setTimeout(updateStreamModalViewport, 80);
+    window.setTimeout(updateStreamModalViewport, 220);
+  }
+
   function lockPageScroll() {
     if (streamModalBodyStyle) return;
     const body = document.body;
@@ -315,9 +325,12 @@
     setModalBackgroundInert(modal, true);
     modal.hidden = false;
     document.body.classList.add('stream-modal-open');
-    updateStreamModalViewport();
-    requestAnimationFrame(() => modal.classList.add('is-open'));
+    syncStreamModalViewport();
     safeFocus(close);
+    requestAnimationFrame(() => {
+      syncStreamModalViewport();
+      modal.classList.add('is-open');
+    });
   }
   function releaseCard(release, settings) {
     const card = node('article', 'release-card');
