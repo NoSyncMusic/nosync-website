@@ -1,117 +1,185 @@
-# Update: automatische shows via Bandsintown — 1 oktober 2026
+# No Sync — official website
 
-Deze update koppelt de showsectie aan het officiële Bandsintown-profiel van No Sync, artiest-ID 15598110. Publiceer nieuwe optredens in Bandsintown for Artists; de website haalt de komende shows daarna via de officiële widget op. Je hebt hiervoor geen eigen API-sleutel nodig. Deze update is voorbereid, nog niet geüpload.
+De broncode van de officiële No Sync-website.
 
-## Eén keer installeren
+## Werkwijze
 
-Pak de ZIP uit en upload ALLE bestanden, inclusief `.pages.yml`, samen naar de hoofdmap van de bestaande repository. Kies één keer Commit changes. De bestaande media en `content.json` hoeven niet opnieuw te worden geüpload; ze zitten niet in dit updatepakket. Op Mac toont Command + Shift + . de verborgen `.pages.yml`.
+- **GitHub** is de broncode en versiegeschiedenis.
+- **GitHub Pages** is de testomgeving.
+- **Pages CMS** gebruik je voor dagelijkse contentwijzigingen.
+- **Namecheap Stellar Plus** is de productiehosting.
+- Publiceren naar productie gebeurt alleen via **Pages CMS → Publiceer naar Namecheap**.
 
-## Shows beheren
+Preview: https://nosyncmusic.github.io/nosync-website/  
+Productie: https://nosyncmusic.com/
 
-- Beheer gepubliceerde optredens in Bandsintown for Artists, onder het profiel No Sync.
-- De koppeling gebruikt de artiestenlink bij Muziek, links & contact → Bandsintown-link.
-- Onder Homepage & kleuren → Showsectie → Shows automatisch laden staat `bandsintown`. Kies `manual` om weer alleen de CMS-shows te gebruiken.
-- De datum, locatie, showtitel en ticketlinks worden door Bandsintown geleverd. De widget toont de komende shows, zonder lokale filtering of handmatig ingestelde selectie van evenement-ID's. Nieuwe shows komen dus automatisch mee.
-- Bij de controle gaf het echte profiel 0 komende shows terug. Daarom blijven de huidige CMS-shows als reserve zichtbaar. De show Merow Presents: BASS RELATED (ADE Edition), 21 oktober, Chin Chin Club is behouden in jouw bestaande contentbestand.
-- Zodra Bandsintown komende shows teruggeeft, wordt de automatische lijst getoond en is de handmatige reserve verborgen. De twee lijsten worden niet samengevoegd; zo verschijnt dezelfde show niet dubbel.
-- Voor volledig beheer via Bandsintown: zet je huidige show ook daar online en zet vervolgens je handmatige CMS-shows op onzichtbaar of maak die lijst leeg. Dan kan een oude handmatige show niet terugkeren als de Bandsintown-lijst later leeg raakt. Tot die tijd beheer je eventuele wijzigingen of annuleringen van de reserveshow nog in het CMS.
+## Pages CMS
 
-## Gedrag bij laden en storingen
+### Design, teksten & kleuren
 
-De widget laadt pas als een bezoeker in de buurt van de showsectie scrollt. Bij een blokkade of trage verbinding blijven de handmatige reserveshows en een directe Bandsintown-link beschikbaar. Komt de widget later alsnog binnen, dan schakelt de website naar de automatische lijst. Zonder JavaScript verwijst de showsectie direct naar Bandsintown.
+Hier beheer je onder andere:
 
-De widget gebruikt je actuele CMS-kleuren en het lokaal geladen DM Sans-font. De extra follow- en request-a-show-blokken worden verborgen; de Bandsintown-vermelding blijft staan. De eigen site blijft beveiligd met een Content Security Policy. Alleen de benodigde Bandsintown-script-, API- en framedomeinen zijn toegevoegd; externe inline scripts blijven geblokkeerd. De widget is code van een derde partij en maakt verbinding met Bandsintown, inclusief hun eigen widgetfunctionaliteit en metingen. De eerdere audit hieronder beschrijft de website vóór deze toevoeging.
+- hero-tekst, genres, foto en logo;
+- navigatie en sectieteksten;
+- release- en pre-saveknoppen;
+- shows- en contactteksten;
+- huisstijlkleuren.
 
-## Controle
+De ongebruikte oude hero-tagline is verborgen om dubbele tekst te voorkomen.
 
-De echte Bandsintown-feed en artiestgegevens zijn opgehaald: artiestnaam No Sync, ID 15598110, 0 komende shows. De officiële widget is vervolgens gecontroleerd met die opgehaalde gegevens en met een afzonderlijke testshow, die niet is gepubliceerd en niet in deze export zit. Getest: desktop 1280 px, mobiel 390 en 320 px, geen horizontale overflow, geen dubbele handmatige show bij geladen Bandsintown-shows, lege feed, handmatige modus en geblokkeerde widget. De testomgeving heeft trage externe verbindingen; de widgettests gebruiken lokale kopieën van de officiële widget en vastgelegde of gesimuleerde antwoorden. De productiecode haalt alles rechtstreeks van Bandsintown.
+### Content, releases & contact
 
-Officiële uitleg: https://help.artists.bandsintown.com/en/articles/7053470-sync-your-events-to-your-website
+De editor is geordend als:
 
----
+1. statistieken;
+2. aankomende releases & pre-saves;
+3. uitgebrachte releases;
+4. Explore-links;
+5. shows;
+6. socials;
+7. externe links;
+8. contactadressen.
 
-## Eerdere volledige beoordeling (30 september 2026)
+Herhaalbare items zijn inklapbaar en tonen herkenbare namen, bijvoorbeeld de releasetitel, het social-platform of de showdatum in plaats van `Item #1`.
 
-# No Sync — websitecheck en uploadpakket
+## Statistieken
 
-Beoordeling en export: 30 september 2026. Gebaseerd op de huidige website in NoSyncMusic/nosync-website, inclusief de CMS-wijziging van de showtitel naar TBA (commit 4f0f00d).
+De homepage toont:
 
-## Advies en uitgevoerde verbeteringen
+- **Total streams** — handmatig in Pages CMS;
+- **Official releases** — automatisch uit de zichtbare releasecatalogus;
+- **Countries streaming** — handmatig in Pages CMS.
 
-De sterke basis is het donkere ontwerp, het herkenbare logo, de grote typografische artiestennaam en de huidige portretfoto. Mijn advies is die identiteit te behouden, met rood als accent. Gewone tekst hoort rustig lichtgrijs te zijn; koppen bijna wit. Een hele website met donkerrode tekst wordt minder leesbaar en oogt onrustiger.
+Official releases wordt automatisch per vijf afgerond:
 
-| Onderdeel | Beoordeling en verbetering |
-| --- | --- |
-| Kleuren | Donkere achtergrond, bijna witte koppen en grijze ondersteunende tekst. Rood wordt gebruikt voor de luisterknop, kleine labels en showdatum. Geen gele interfaceaccenten. Kleuren in bestaande artwork blijven behouden. |
-| Fonts | Barlow Condensed voor de grote titels en DM Sans voor gewone tekst passen bij een dance-artiest. Behouden, met duidelijkere groottes, regelafstanden en lokale WOFF2-bestanden. Fontlicenties blijven inbegrepen. |
-| Foto’s en artwork | Je portret, logo, releasecovers en AFTERHOURS-cover blijven herkenbaar. De afbeeldingen zijn technisch geoptimaliseerd naar WebP. Het logo wordt op een passende resolutie geladen. Geen vervangende of verzonnen artiestenfoto’s. |
-| Layout | Meer rust en een duidelijkere volgorde: artiest → releases → sets en playlists → shows → contact. De uitgelichte release krijgt drie directe platforms; andere releases twee. Alle overige links blijven bereikbaar via “More platforms”. |
-| Mobiel | Groter, leesbaar menu met aanraakruimte. Foto boven de artiestennaam. Kaarten, contactgegevens en shows passen ook op een scherm van 320 pixels zonder horizontaal scrollen. |
-| Teksten | De onbedoeld zichtbare `\n` is opgelost. Kortere sectiekoppen en duidelijkere linktitels: “Submit your track”, “Stookhoksessies #452” en “AFTERHOURS”. De genrekeuze Bass House · Tech House en alle bestaande contactadressen zijn behouden. |
-| Shows | Geldige komende datums worden gesorteerd en vergeleken met de huidige datum in Nederland. Voor TBA worden neutrale teksten getoond. Er zijn geen evenementnamen, venues of ticketlinks verzonnen. |
-| Toegankelijkheid | Duidelijke kopstructuur, toetsenbordfocus, een “Skip to content”-link, toegankelijke luisterlinks, grotere klikvlakken en ondersteuning voor minder beweging. Decoratieve covers hebben een lege alt-tekst binnen een duidelijk benoemde link. |
-| CMS en kleurcodes | Homepage, koppen, knoppen, foto’s, kleuren en content blijven te beheren via Pages CMS. HEX-codes met 3 of 6 tekens werken met en zonder `#` en met spaties aan de uiteinden. Ongeldige kleuren vallen terug op de huidige huisstijl. |
-| Snelheid | De 11 gebruikte bronafbeeldingen gaan van 5.857.744 naar 1.066.074 bytes: circa 82% kleiner. De vijf gebruikte WOFF2-fontbestanden nemen samen 123.564 bytes in, tegenover 407.772 bytes voor de oorspronkelijke zes TTF-bestanden: circa 70% minder bytes voor de fontbestanden. Een ongebruikt fontgewicht is weggelaten. Deze percentages betreffen de assets, niet een gegarandeerd percentage snellere laadtijd. |
-| Vindbaarheid en delen | De huidige inhoud staat ook direct in HTML, met titel, omschrijving, canonical, deelmetadata, een favicon en een deelafbeelding met je echte portret en logo. Crawlers hoeven niet eerst JavaScript uit te voeren om je huidige releases en contactinformatie te vinden. |
-| Code en betrouwbaarheid | Leesbare, gestructureerde broncode zonder externe JavaScriptbibliotheken. Nieuwe bestandsversies en verse JSON-verzoeken beperken het oude cacheprobleem. Bij ontbrekende of ongeldige JSON blijft de gepubliceerde versie bruikbaar. |
-| Codebeveiliging | CMS-teksten worden als tekst verwerkt via `textContent`. Onveilige linkprotocollen en URL’s met inloggegevens worden geweigerd. Externe links gebruiken HTTPS en `noopener noreferrer`. Een Content Security Policy begrenst scripts, frames en andere bronnen. Geen trackers, formulieren of database toegevoegd. |
+- 1–4 → exact aantal;
+- 5–9 → `5+`;
+- 10–14 → `10+`;
+- enzovoort.
 
-Bij een donkere achtergrond worden kleine rode accentteksten indien nodig iets lichter gemaakt voor voldoende contrast. De rode accentkleur zelf blijft behouden. Ook onleesbare tekst op de gekleurde knop krijgt automatisch donker of licht contrast. Je gekozen gewone tekstkleur en kopkleur worden exact gebruikt: die moet je zelf leesbaar houden na wijzigingen.
+De cijfers animeren één keer wanneer de statistieken in beeld komen. Bij `prefers-reduced-motion` wordt niet geanimeerd.
 
-## Wat ik nog zou aanvullen
+## Releases
 
-- De definitieve evenementnaam, venue en eventuele ticketlink voor 21 oktober 2026. De huidige datum en Amsterdam zijn overgenomen uit je CMS; controleer dat deze gegevens bevestigd zijn. Je kunt dit later invullen zonder opnieuw de hele website te uploaden.
-- Op termijn een echte livefoto voor je presskit of een extra sectie. Je huidige portret werkt goed als hoofdfoto; een livefoto kan daarnaast je podiumenergie laten zien.
-- Een korte, feitelijke artiestenbio wanneer je die wilt toevoegen. Daarvoor zijn jouw eigen verhaal en relevante feiten nodig; ik heb geen prestaties, optredens of samenwerkingen verzonnen.
+### Uitgebrachte releases
 
-## Getest
+Iedere release kan bevatten:
 
-- Desktop 1440 px, tablet 768 px, mobiel 390 px en klein mobiel 320 px: geen horizontale overflow, alle huidige afbeeldingen geladen.
-- Op alle vier schermformaten: één uitgelichte release, vier overige releases, zeven socials en vier overige links.
-- Automatische axe-controle op WCAG 2 A/AA en WCAG 2.1 AA: geen gevonden overtredingen in de geteste pagina. Dit is geen volledige toegankelijkheidscertificering; de screenshots zijn ook visueel gecontroleerd.
-- CMS-wijzigingen van titels, introductie, knoppen, omschrijving en kleuren, waaronder `#721E1E`, `#ddd` en codes zonder `#`.
-- Alle negen luisterplatforms van de uitgelichte release blijven beschikbaar, ook zonder JavaScript.
-- Ontbrekende JSON, ongeldige kleuren, ontbrekende velden en null-items laten de code niet vastlopen.
-- HTML-achtige CMS-tekst blijft gewone tekst; `javascript:`, `data:`-afbeeldingen en URL’s met inloggegevens worden geweigerd.
-- Ongeldige datums en afgelopen shows worden niet als komende shows getoond.
-- In de geteste normale pagina geen JavaScriptfouten of CSP-blokkades van eigen onderdelen.
-- 38 unieke externe links met een HTTP-verzoek gecontroleerd: 35 gaven status 200. TikTok, Beatport en Bandsintown gaven 403 en kunnen hiermee niet op bereikbaarheid worden beoordeeld. Hun bestaande links zijn behouden. Status 200 garandeert niet dat een platform nooit een login, regiobeperking of latere wijziging toont.
+- titel;
+- artiest(en);
+- releasedatum;
+- artwork;
+- featured-status;
+- streaminglinks.
 
-## In één upload doorvoeren
+Op de All releases-pagina kan de bezoeker wisselen tussen:
 
-1. Pak de ZIP uit. De bestanden staan direct in de uitgepakte map.
-2. Open de hoofdmap van https://github.com/NoSyncMusic/nosync-website.
-3. Kies **Add file → Upload files**.
-4. Upload alle bestanden uit de uitgepakte map én de complete map **media**. Upload de inhoud op hetzelfde niveau als de bestaande `index.html`; maak geen extra bovenliggende map.
-5. Neem ook **.pages.yml** en **.nojekyll** mee. Deze bestanden zijn op een Mac verborgen: druk in Finder op **Command + Shift + .** om het zichtbaar te maken.
-6. Klik één keer op **Commit changes**. Bestaande bestanden met dezelfde naam worden vervangen. De websitebestanden staan klaar; je hoeft geen build, installatie of andere hostingdienst in te stellen.
-7. Wacht tot GitHub Pages klaar is met publiceren en bekijk https://nosyncmusic.github.io/nosync-website/.
+- **Grid** — standaard;
+- **By year** — gegroepeerd op releasejaar.
 
-De export verwijst alleen naar de geoptimaliseerde media. Oude, ongebruikte bestanden die al in GitHub staan worden door een upload niet verwijderd; ze worden door deze versie niet geladen.
+De gekozen weergave wordt lokaal in de browser onthouden.
 
-Dit pakket is voorbereid en lokaal getest. Het is nog niet in jouw repository geüpload of live gepubliceerd.
+### Aankomende releases
 
-## Later zelf aanpassen
+Voeg een aankomende release één keer toe met:
 
-Open je bestaande Pages CMS en kies:
+- slug;
+- titel;
+- artiest;
+- releasedatum;
+- artwork;
+- ISRC;
+- eventuele smartlink/pre-saveprovider.
 
-- **Homepage & kleuren**: artiestennaam, paginatitel, omschrijving, grote titel, introductie, foto, logo, menu, sectiekoppen, knoppen, lege-showtekst en kleuren.
-- **Muziek, links & contact**: socials, releases, luisterlinks, artwork, sets, playlists, shows, presskit en e-mailadressen.
+De statische pre-savepagina wordt automatisch aangemaakt onder:
 
-Gebruik in de grote titel echte nieuwe regels. Een letterlijk geschreven `\n` wordt voor bestaande invoer ook ondersteund. Gebruik voor externe links de volledige `https://`-URL. Zet “Zichtbaar” uit om een release, link of show te verbergen. Als meerdere releases “Uitgelicht” zijn, wordt de eerste gekozen.
+`/presave/<slug>/`
 
-Na opslaan moet GitHub Pages de wijziging nog publiceren. Herlaad daarna de pagina. In Safari op een Mac kun je met **Option + Command + R** opnieuw laden; **Command + Shift + R** kan Reader openen. Versies van CSS en JavaScript in deze export en verse JSON-verzoeken helpen oude inhoud uit de browsercache te voorkomen.
+Die pagina krijgt eigen Open Graph/Twitter metadata voor delen via WhatsApp, Discord, iMessage en sociale platforms.
 
-## Grenzen en onderhoud
+## Spotify-automatisering
 
-**Live CMS-inhoud en HTML-terugval:** bezoekers met JavaScript krijgen de nieuwste JSON uit het CMS. De HTML-terugval en de deelafbeelding zijn een momentopname van deze export. Een CMS-opslag bouwt die momentopname niet opnieuw. Voor actuele statische zoek-/deelmetadata, inhoud zonder JavaScript of een latere terugval is een nieuwe HTML-export of een automatische build nodig. De actuele showfiltering werkt met JavaScript; de HTML-momentopname bevat de showgegevens van de exportdatum.
+Workflow: `.github/workflows/sync-spotify.yml`
 
-**Domein:** de canonical en deel-URL’s verwijzen nu naar de bestaande GitHub Pages-adres omdat nosyncmusic.com nog niet aan deze hosting is gekoppeld. Bij een latere domeinwissel moeten die URL’s mee wijzigen. Dit pakket bevat geen CNAME en verandert geen DNS, Namecheap-instellingen of hostingprovider.
+- draait iedere 6 uur en handmatig;
+- zoekt aankomende releases op ISRC;
+- controleert dat de gevonden track bij No Sync hoort;
+- vult Spotify-data aan;
+- zet een gevonden release automatisch op `released`;
+- behoudt handmatige streaminglinks.
 
-**Beveiliging:** dit is een beoordeling van de openbare websitebestanden en hun gedrag, geen volledige penetratietest. GitHub-/CMS-accounttoegang, tweestapsverificatie en serverheaders zijn niet vanuit deze ZIP aan te passen. Controleer in GitHub Pages dat HTTPS is ingeschakeld. De CSP staat in HTML; onder andere bescherming tegen insluiten via `frame-ancestors` vereist een echte serverheader. Inline CSS blijft toegestaan voor dynamische kleuren; inline uitvoerbare JavaScript is geblokkeerd. De site bevat geen formulier/backend, trackingcode of in deze beoordeling gevonden hardcoded API-sleutels. Publiceer toekomstige sleutels nooit in deze openbare repository.
+De automatisch gevulde Spotify-velden zijn in Pages CMS **readonly**.
 
-Officiële documentatie voor de veiligheidsmaatregelen:
+Benodigde GitHub secrets:
 
-- https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy
-- https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html
-- https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https
+- `SPOTIFY_CLIENT_ID`
+- `SPOTIFY_CLIENT_SECRET`
+
+## Pre-save generator
+
+Workflow: `.github/workflows/generate-presave-pages.yml`
+
+De generator:
+
+- maakt statische releasepagina's;
+- verwijdert pagina's wanneer de bijbehorende upcoming release wordt verwijderd;
+- genereert release-specifieke social metadata;
+- commit nieuwe en gewijzigde pagina's automatisch.
+
+## Shows
+
+Standaard worden shows geladen via Bandsintown.
+
+Artiest-ID: `15598110`
+
+Handmatige shows in `content.json` blijven beschikbaar als reserve of wanneer de showbron op `manual` wordt gezet.
+
+## Browser- en configuratietests
+
+Workflow: `.github/workflows/site-browser-smoke.yml`
+
+Automatische checks omvatten:
+
+- Chromium;
+- Firefox;
+- WebKit;
+- touch/mobile;
+- iPhone portrait, compact en landscape;
+- horizontale overflow;
+- streamingmodal en scroll-lock;
+- Grid / By year-weergave;
+- opgeslagen releaseweergave;
+- homepage-statistieken;
+- JavaScriptfouten;
+- geldige `.pages.yml`-YAML.
+
+## Publiceren naar Namecheap
+
+Gebruik uitsluitend:
+
+**Pages CMS → Publiceer naar Namecheap**
+
+De productie-workflow accepteert alleen een Pages CMS-payload, valideert de repository en publiceert exact de gekozen commit.
+
+Workflow: `.github/workflows/deploy-namecheap.yml`
+
+GitHub secrets:
+
+- `NAMECHEAP_FTP_HOST`
+- `NAMECHEAP_FTP_USER`
+- `NAMECHEAP_FTP_PASSWORD`
+
+De volgende beheerbestanden worden niet naar productie geüpload:
+
+- `.git/`
+- `.github/`
+- `.pages.yml`
+- `README.md`
+- `scripts/`
+
+## Voor livegang
+
+1. Controleer de GitHub Pages-preview.
+2. Wacht tot **Site browser smoke tests** groen zijn.
+3. Controleer homepage, All releases en eventuele pre-savepagina.
+4. Publiceer daarna via Pages CMS naar Namecheap.
