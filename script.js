@@ -67,6 +67,9 @@
       .sort((a, b) => rank(a.type) - rank(b.type));
   }
   let streamModalReturnFocus = null;
+  let streamModalCloseTimer = null;
+  let streamModalScrollY = 0;
+  let streamModalBodyStyle = null;
 
   function uniqueLinks(value) {
     const seen = new Set();
@@ -78,18 +81,92 @@
     });
   }
 
+  function setModalBackgroundInert(modal, enabled) {
+    [...document.body.children].forEach((child) => {
+      if (child === modal) return;
+      if (enabled) {
+        if (!child.hasAttribute('inert')) {
+          child.setAttribute('inert', '');
+          child.dataset.streamModalInert = 'true';
+        }
+      } else if (child.dataset.streamModalInert === 'true') {
+        child.removeAttribute('inert');
+        delete child.dataset.streamModalInert;
+      }
+    });
+  }
+
+  function updateStreamModalViewport() {
+    const modal = byId('stream-modal');
+    if (!modal || modal.hidden) return;
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    modal.style.setProperty('--modal-vv-top', `${viewport.offsetTop}px`);
+    modal.style.setProperty('--modal-vv-left', `${viewport.offsetLeft}px`);
+    modal.style.setProperty('--modal-vv-width', `${viewport.width}px`);
+    modal.style.setProperty('--modal-vv-height', `${viewport.height}px`);
+  }
+
+  function lockPageScroll() {
+    if (streamModalBodyStyle) return;
+    const body = document.body;
+    streamModalScrollY = window.scrollY || window.pageYOffset || 0;
+    streamModalBodyStyle = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow
+    };
+    body.style.position = 'fixed';
+    body.style.top = `-${streamModalScrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+  }
+
+  function unlockPageScroll() {
+    if (!streamModalBodyStyle) return;
+    const body = document.body;
+    const previous = streamModalBodyStyle;
+    streamModalBodyStyle = null;
+    body.style.position = previous.position;
+    body.style.top = previous.top;
+    body.style.left = previous.left;
+    body.style.right = previous.right;
+    body.style.width = previous.width;
+    body.style.overflow = previous.overflow;
+    const root = document.documentElement;
+    const previousScrollBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, streamModalScrollY);
+    requestAnimationFrame(() => { root.style.scrollBehavior = previousScrollBehavior; });
+  }
+
+  function safeFocus(element) {
+    if (!element || !document.contains(element)) return;
+    try { element.focus({ preventScroll: true }); }
+    catch { element.focus(); }
+  }
+
   function closeStreamModal() {
     const modal = byId('stream-modal');
     if (!modal || modal.hidden || modal.dataset.closing === 'true') return;
     modal.dataset.closing = 'true';
     modal.classList.remove('is-open');
-    document.body.classList.remove('stream-modal-open');
     const target = streamModalReturnFocus;
     streamModalReturnFocus = null;
-    window.setTimeout(() => {
+    clearTimeout(streamModalCloseTimer);
+    streamModalCloseTimer = window.setTimeout(() => {
+      if (modal.classList.contains('is-open')) return;
       modal.hidden = true;
       modal.dataset.closing = 'false';
-      if (target && document.contains(target)) target.focus();
+      document.body.classList.remove('stream-modal-open');
+      setModalBackgroundInert(modal, false);
+      unlockPageScroll();
+      safeFocus(target);
     }, STREAM_MODAL_ANIMATION_MS);
   }
 
@@ -103,7 +180,7 @@
       if (event.target === modal) closeStreamModal();
     });
     document.addEventListener('keydown', (event) => {
-      if (modal.hidden) return;
+      if (modal.hidden || modal.dataset.closing === 'true') return;
       if (event.key === 'Escape') {
         event.preventDefault();
         closeStreamModal();
@@ -123,6 +200,11 @@
       }
     });
     document.body.append(modal);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateStreamModalViewport, { passive: true });
+      window.visualViewport.addEventListener('scroll', updateStreamModalViewport, { passive: true });
+    }
+    window.addEventListener('orientationchange', updateStreamModalViewport, { passive: true });
     return modal;
   }
 
@@ -164,12 +246,17 @@
 
     panel.append(header, releaseRow, servicesTitle, services);
     modal.replaceChildren(panel);
+    clearTimeout(streamModalCloseTimer);
+    streamModalCloseTimer = null;
     streamModalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     modal.dataset.closing = 'false';
+    lockPageScroll();
+    setModalBackgroundInert(modal, true);
     modal.hidden = false;
     document.body.classList.add('stream-modal-open');
+    updateStreamModalViewport();
     requestAnimationFrame(() => modal.classList.add('is-open'));
-    close.focus();
+    safeFocus(close);
   }
 
   function releaseCard(release, featured, settings) {
