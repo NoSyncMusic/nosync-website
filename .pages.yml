@@ -85,8 +85,14 @@ content:
       label: Kop
       type: string
       required: true
-    - name: spotifyLabel
-      label: Tekst Spotify-link
+    - name: allReleasesLabel
+      label: Tekst All releases-knop
+      type: string
+    - name: allReleasesEyebrow
+      label: Kleine tekst op All releases-pagina
+      type: string
+    - name: allReleasesTitle
+      label: Titel op All releases-pagina
       type: string
     - name: streamHereLabel
       label: Tekst Stream Here-knop
@@ -434,6 +440,7 @@ content:
           - BEATPORT
           - SOUNDCLOUD
           - AMAZON_MUSIC
+          - AUDIOMACK
           - ANGHAMMI
           - TIDAL
       - name: url
@@ -454,6 +461,10 @@ content:
     - name: artist
       label: Artiesten
       type: string
+    - name: releaseDate
+      label: Releasedatum (optioneel)
+      type: date
+      description: Nieuwe releases krijgen dit automatisch via de Spotify/ISRC-sync. Voor handmatig toegevoegde releases kun je hem zelf invullen.
     - name: artwork
       label: Artwork
       type: image
@@ -467,9 +478,10 @@ content:
       label: Zichtbaar
       type: boolean
     - name: links
-      label: Luisterlinks
+      label: Streamingdiensten / luisterlinks
       type: object
       list: true
+      description: Deze links kun je altijd handmatig aanvullen of aanpassen. Iedere geldige link verschijnt automatisch in de Stream Here-popup.
       fields:
       - name: type
         label: Platform
@@ -484,6 +496,7 @@ content:
           - BEATPORT
           - SOUNDCLOUD
           - AMAZON_MUSIC
+          - AUDIOMACK
           - ANGHAMMI
           - TIDAL
       - name: url
