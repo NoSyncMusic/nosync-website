@@ -527,3 +527,14 @@ content:
     - name: note
       label: Toelichting
       type: text
+
+actions:
+- name: publish-namecheap
+  label: Publiceer naar Namecheap
+  workflow: deploy-namecheap.yml
+  ref: current
+  cancelable: false
+  confirm:
+    title: Website live publiceren?
+    message: Publiceert exact deze geteste GitHub-versie naar Namecheap. Controleer eerst de GitHub Pages-preview.
+    button: Publiceer
