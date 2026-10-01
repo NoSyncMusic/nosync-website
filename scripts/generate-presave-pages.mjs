@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+// Generated pages are static share targets with release-specific social metadata.
+
 const root = process.cwd();
 const content = JSON.parse(await fs.readFile(path.join(root, 'content.json'), 'utf8'));
 const template = await fs.readFile(path.join(root, 'presave', 'index.html'), 'utf8');
