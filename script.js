@@ -12,6 +12,14 @@
     SMART_LINK: 'All platforms', OTHER: 'Other'
   };
   const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT', 'OTHER'];
+  const HERO_SOCIAL_TYPES = ['INSTAGRAM', 'SPOTIFY', 'YOUTUBE', 'TIKTOK'];
+  const linkCategoryLabels = {
+    DJ_SET: 'DJ SET',
+    PLAYLIST: 'PLAYLIST',
+    FREE_DOWNLOAD: 'FREE DOWNLOAD',
+    FOR_ARTISTS: 'FOR ARTISTS',
+    MUSIC: 'MUSIC'
+  };
   const HOME_RELEASE_LIMIT = 5;
   const STREAM_MODAL_ANIMATION_MS = 260;
 
@@ -286,6 +294,8 @@
     const body = node('div', 'release-body');
     if (featured && words(release.badge).trim()) body.append(node('p', 'release-badge', release.badge));
     body.append(node('h3', '', title), node('p', 'release-artist', words(release.artist)));
+    const dateText = formatCardDate(words(release.releaseDate, words(release._releaseDate)));
+    if (dateText) body.append(node('p', 'release-card-date', dateText));
     if (links.length) {
       const action = node('button', 'button button-accent stream-here-button', settings.music.streamHereLabel);
       action.type = 'button';
@@ -351,6 +361,8 @@
     document.querySelector('meta[name="description"]').content = settings.description;
     document.querySelector('meta[property="og:title"]').content = settings.pageTitle;
     document.querySelector('meta[property="og:description"]').content = settings.description;
+    const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDescription) twitterDescription.content = settings.description;
     const title = settings.hero.title.replace(/\\n/g, '\n');
     const lines = title.split('\n').filter((line) => line.trim());
     byId('artist-name').replaceChildren(...(lines.length ? lines : [settings.artistName]).map((line) => node('span', 'title-line', line)));
@@ -378,6 +390,8 @@
       'nav-shows': settings.navigation.shows, 'nav-contact': settings.navigation.contact,
       'music-eyebrow': settings.music.eyebrow, 'music-title': settings.music.title, 'all-releases-link': settings.music.allReleasesLabel,
       'links-eyebrow': settings.links.eyebrow, 'links-title': settings.links.title,
+      'links-primary-label': words(settings.links.primaryLabel, 'Listen & explore'),
+      'links-secondary-label': words(settings.links.secondaryLabel, 'For artists'),
       'shows-eyebrow': settings.shows.eyebrow, 'shows-title': settings.shows.title, 'bandsintown': settings.shows.bandsintownLabel,
       'contact-eyebrow': settings.contact.eyebrow, 'contact-title': settings.contact.title, 'presskit': settings.contact.presskitLabel,
       'footer-name': settings.footer.name, 'back-to-top': settings.footer.backToTop
@@ -393,6 +407,11 @@
     const date = validDate(value);
     if (!date) return '';
     return `Released ${new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date)}`;
+  }
+  function formatCardDate(value) {
+    const date = validDate(value);
+    if (!date) return '';
+    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date).toUpperCase();
   }
   function todayInAmsterdam() {
     const parts = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -510,7 +529,7 @@
   }
   function releasePageUrl(release) {
     const slug = releaseSlug(release);
-    return slug ? `presave/?release=${encodeURIComponent(slug)}` : '#';
+    return slug ? `presave/${encodeURIComponent(slug)}/` : '#';
   }
   function releaseIdentity(release) {
     const clean = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -567,14 +586,78 @@
     card.append(cover, body);
     host.append(card);
   }
+  function renderHighlights(content) {
+    const host = byId('credibility-strip');
+    if (!host) return;
+    host.replaceChildren();
+    rows(content.highlights).slice(0, 3).forEach((item) => {
+      const block = node('div', 'credibility-item');
+      block.append(
+        node('strong', 'credibility-value', words(item.value)),
+        node('span', 'credibility-label', words(item.label))
+      );
+      host.append(block);
+    });
+    host.hidden = host.childElementCount === 0;
+  }
+
+  function createExploreCard(link) {
+    const card = externalLink(webUrl(link.url), undefined, 'link-card');
+    const image = node('span', 'link-art');
+    image.append(artwork(link.image));
+    const body = node('span', 'link-body');
+    const category = words(link.category).trim();
+    if (category) body.append(node('span', 'link-kicker', linkCategoryLabels[category] || category.replaceAll('_', ' ')));
+    body.append(node('span', 'link-title', words(link.title, 'Explore')));
+    if (words(link.subtitle).trim()) body.append(node('span', 'link-subtitle', link.subtitle));
+    const arrow = node('span', 'link-arrow', '↗');
+    arrow.setAttribute('aria-hidden', 'true');
+    card.append(image, body, arrow);
+    return card;
+  }
+
+  function setupRevealMotion() {
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const selector = '.hero-copy, .hero-image, .credibility-strip, .section-header, .featured-release, .release-card, .link-group, .show-row, .contact-card';
+    const targets = [...document.querySelectorAll(selector)].filter((item) => item.dataset.revealBound !== 'true');
+    if (!targets.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('reveal-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    targets.forEach((item, index) => {
+      item.dataset.revealBound = 'true';
+      item.classList.add('reveal-ready');
+      item.style.setProperty('--reveal-delay', `${Math.min(index % 4, 3) * 45}ms`);
+      observer.observe(item);
+    });
+  }
+
   function render(content, settings) {
     applySettings(settings);
+    renderHighlights(content);
     renderUpcoming(content, settings);
+
+    const socials = rows(content.socials).filter((social) => webUrl(social.url));
+    const primarySocials = socials.filter((social) => HERO_SOCIAL_TYPES.includes(words(social.type)));
+    const heroSocials = (primarySocials.length ? primarySocials : socials).slice(0, 4);
     byId('socials').replaceChildren();
-    rows(content.socials).forEach((social) => {
-      const url = webUrl(social.url);
-      if (url) byId('socials').append(externalLink(url, platformLabel(social), 'social-link'));
+    heroSocials.forEach((social) => {
+      byId('socials').append(externalLink(webUrl(social.url), platformLabel(social), 'social-link'));
     });
+    const footerSocials = byId('footer-socials');
+    if (footerSocials) {
+      footerSocials.replaceChildren();
+      const secondary = socials.filter((social) => !heroSocials.includes(social)).slice(0, 4);
+      (secondary.length ? secondary : heroSocials.slice(0, 3)).forEach((social) => {
+        footerSocials.append(externalLink(webUrl(social.url), platformLabel(social), 'footer-social-link'));
+      });
+      footerSocials.hidden = footerSocials.childElementCount === 0;
+    }
+
     const today = todayInAmsterdam();
     const manualReleases = rows(content.releases).filter((release) => release.visible !== false);
     const automaticReleases = rows(content.upcomingReleases)
@@ -591,6 +674,7 @@
         releases.unshift({ ...existing, ...automatic, links: [...rows(existing.links), ...rows(automatic.links)] });
       } else releases.unshift(automatic);
     });
+    releases.sort((a, b) => words(b.releaseDate, words(b._releaseDate)).localeCompare(words(a.releaseDate, words(a._releaseDate))));
     const homepageReleases = releases.slice(0, HOME_RELEASE_LIMIT);
     const automaticFeatured = automaticReleases[0]
       ? homepageReleases.find((release) => releaseIdentity(release) === releaseIdentity(automaticReleases[0]))
@@ -602,20 +686,21 @@
     homepageReleases.filter((release) => release !== featured).forEach((release) => byId('releases').append(releaseCard(release, false, settings)));
     visibility('music', releases.length > 0);
     byId('listen-button').hidden = !releases.length;
-    byId('link-grid').replaceChildren();
+
+    const listenerHost = byId('link-grid');
+    const artistHost = byId('artist-link-grid');
+    listenerHost.replaceChildren();
+    artistHost.replaceChildren();
     rows(content.links).filter((link) => link.visible !== false && webUrl(link.url)).forEach((link) => {
-      const card = externalLink(webUrl(link.url), undefined, 'link-card');
-      const image = node('span', 'link-art');
-      image.append(artwork(link.image));
-      const body = node('span', 'link-body');
-      body.append(node('span', 'link-title', words(link.title, 'Explore')));
-      if (words(link.subtitle).trim()) body.append(node('span', 'link-subtitle', link.subtitle));
-      const arrow = node('span', 'link-arrow', '↗');
-      arrow.setAttribute('aria-hidden', 'true');
-      card.append(image, body, arrow);
-      byId('link-grid').append(card);
+      const target = words(link.category) === 'FOR_ARTISTS' ? artistHost : listenerHost;
+      target.append(createExploreCard(link));
     });
-    visibility('links', byId('link-grid').childElementCount > 0);
+    const listenerGroup = byId('listener-links-group');
+    const artistGroup = byId('artist-links-group');
+    if (listenerGroup) listenerGroup.hidden = listenerHost.childElementCount === 0;
+    if (artistGroup) artistGroup.hidden = artistHost.childElementCount === 0;
+    visibility('links', listenerHost.childElementCount + artistHost.childElementCount > 0);
+
     renderShows(content, settings);
     document.dispatchEvent(new CustomEvent('nosync:content-ready', { detail: { content, settings } }));
     updateExternal('bandsintown', content.bandsintown);
@@ -632,6 +717,7 @@
       if (words(contact.note).trim()) item.append(node('p', 'contact-note', contact.note));
       byId('contacts').append(item);
     });
+    requestAnimationFrame(setupRevealMotion);
   }
   async function freshJson(path) {
     const controller = new AbortController();
