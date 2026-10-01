@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /under-construction/
+Disallow: /presave-demo.html
+Disallow: /presave/demo/
+
+Sitemap: https://nosyncmusic.com/sitemap.xml
