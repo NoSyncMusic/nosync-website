@@ -79,7 +79,6 @@
   let streamModalCloseTimer = null;
   let streamModalScrollY = 0;
   let streamModalBodyStyle = null;
-  let streamModalViewportSyncFrame = 0;
 
   function uniqueLinks(value) {
     const seen = new Set();
@@ -107,31 +106,6 @@
         delete child.dataset.streamModalInert;
       }
     });
-  }
-
-  function updateStreamModalViewport() {
-    const modal = byId('stream-modal');
-    if (!modal || modal.hidden) return;
-    const viewport = window.visualViewport;
-    if (!viewport) return;
-    modal.style.setProperty('--modal-vv-top', `${viewport.offsetTop}px`);
-    modal.style.setProperty('--modal-vv-left', `${viewport.offsetLeft}px`);
-    modal.style.setProperty('--modal-vv-width', `${viewport.width}px`);
-    modal.style.setProperty('--modal-vv-height', `${viewport.height}px`);
-  }
-
-  function syncStreamModalViewport() {
-    cancelAnimationFrame(streamModalViewportSyncFrame);
-    const deadline = performance.now() + 600;
-    const tick = () => {
-      updateStreamModalViewport();
-      if (performance.now() < deadline) {
-        streamModalViewportSyncFrame = requestAnimationFrame(tick);
-      } else {
-        streamModalViewportSyncFrame = 0;
-      }
-    };
-    tick();
   }
 
   function lockPageScroll() {
@@ -234,11 +208,6 @@
       }
     });
     document.body.append(modal);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateStreamModalViewport, { passive: true });
-      window.visualViewport.addEventListener('scroll', updateStreamModalViewport, { passive: true });
-    }
-    window.addEventListener('orientationchange', updateStreamModalViewport, { passive: true });
     return modal;
   }
 
@@ -291,7 +260,6 @@
     modal.hidden = false;
     document.body.classList.add('stream-modal-open');
     safeFocus(close);
-    syncStreamModalViewport();
     requestAnimationFrame(() => modal.classList.add('is-open'));
   }
 
