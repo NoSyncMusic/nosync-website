@@ -70,7 +70,6 @@
     "releasedLabel": "Listen on all platforms",
     "followNote": "Pre-save on your preferred service. Follow actions are offered by the connected provider where that service supports them.",
     "countdownLabel": "until release",
-    "servicesLabel": "Pre-save available on",
-    "followLabel": "Follow supported"
+    "servicesLabel": "Pre-save available on"
   }
 }
