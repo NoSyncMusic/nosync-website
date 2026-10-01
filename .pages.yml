@@ -348,8 +348,8 @@ content:
     - name: enabledServices
       label: Streamingdiensten tonen
       type: select
-      list: true
       options:
+        multiple: true
         values:
         - SPOTIFY
         - APPLE_MUSIC
@@ -364,8 +364,8 @@ content:
     - name: followServices
       label: Diensten met followactie
       type: select
-      list: true
       options:
+        multiple: true
         values:
         - SPOTIFY
         - AMAZON_MUSIC
