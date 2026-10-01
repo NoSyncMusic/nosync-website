@@ -8,9 +8,10 @@
     INSTAGRAM: 'Instagram', SPOTIFY: 'Spotify', YOUTUBE: 'YouTube', TIKTOK: 'TikTok',
     FACEBOOK: 'Facebook', SOUNDCLOUD: 'SoundCloud', TWITTER: 'X', APPLE_MUSIC: 'Apple Music',
     YOUTUBE_MUSIC: 'YouTube Music', DEEZER: 'Deezer', BEATPORT: 'Beatport',
-    AMAZON_MUSIC: 'Amazon Music', ANGHAMMI: 'Anghami', TIDAL: 'Tidal', AUDIOMACK: 'Audiomack', SMART_LINK: 'All platforms'
+    AMAZON_MUSIC: 'Amazon Music', ANGHAMMI: 'Anghami', TIDAL: 'Tidal', AUDIOMACK: 'Audiomack',
+    SMART_LINK: 'All platforms', OTHER: 'Other'
   };
-  const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT'];
+  const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT', 'OTHER'];
   const HOME_RELEASE_LIMIT = 5;
   const STREAM_MODAL_ANIMATION_MS = 260;
 
@@ -74,7 +75,10 @@
   function uniqueLinks(value) {
     const seen = new Set();
     return orderedLinks(value).filter((link) => {
-      const key = `${link.type || ''}|${link.url}`;
+      const type = words(link.type).trim();
+      const key = type && type !== 'OTHER'
+        ? `type:${type}`
+        : `other:${platformLabel(link).toLowerCase()}|${link.url}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -117,7 +121,8 @@
       left: body.style.left,
       right: body.style.right,
       width: body.style.width,
-      overflow: body.style.overflow
+      overflow: body.style.overflow,
+      paddingRight: body.style.paddingRight
     };
     body.style.position = 'fixed';
     body.style.top = `-${streamModalScrollY}px`;
@@ -125,6 +130,11 @@
     body.style.right = '0';
     body.style.width = '100%';
     body.style.overflow = 'hidden';
+    const scrollbar = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    if (scrollbar > 0) {
+      const currentPadding = parseFloat(getComputedStyle(body).paddingRight) || 0;
+      body.style.paddingRight = `${currentPadding + scrollbar}px`;
+    }
   }
 
   function unlockPageScroll() {
@@ -138,6 +148,7 @@
     body.style.right = previous.right;
     body.style.width = previous.width;
     body.style.overflow = previous.overflow;
+    body.style.paddingRight = previous.paddingRight;
     const root = document.documentElement;
     const previousScrollBehavior = root.style.scrollBehavior;
     root.style.scrollBehavior = 'auto';
