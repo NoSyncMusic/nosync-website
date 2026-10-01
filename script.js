@@ -437,11 +437,73 @@
     if (url) byId(id).href = url;
   }
 
-  function daysUntil(value) {
+  let homepageCountdownTimer = null;
+
+  function amsterdamMidnightMs(value) {
     const date = validDate(value);
     if (!date) return null;
-    const today = validDate(todayInAmsterdam());
-    return Math.max(0, Math.ceil((date.getTime() - today.getTime()) / 86400000));
+    const [year, month, day] = value.split('-').map(Number);
+    const wanted = Date.UTC(year, month - 1, day, 0, 0, 0);
+    let guess = wanted;
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Amsterdam',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23'
+    });
+    for (let step = 0; step < 3; step += 1) {
+      const parts = formatter.formatToParts(new Date(guess));
+      const get = (type) => Number(parts.find((part) => part.type === type)?.value || 0);
+      const represented = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
+      const delta = wanted - represented;
+      guess += delta;
+      if (Math.abs(delta) < 1000) break;
+    }
+    return guess;
+  }
+
+  function startHomepageCountdown(host, value) {
+    const target = amsterdamMidnightMs(value);
+    if (!host || target === null) return;
+    if (homepageCountdownTimer) {
+      window.clearInterval(homepageCountdownTimer);
+      homepageCountdownTimer = null;
+    }
+
+    const unit = (value, label) => {
+      const wrap = node('span', 'release-countdown-unit');
+      wrap.append(
+        node('strong', 'release-countdown-value', String(value).padStart(2, '0')),
+        node('span', 'release-countdown-label', label)
+      );
+      return wrap;
+    };
+
+    const update = () => {
+      const remaining = Math.max(0, target - Date.now());
+      const totalSeconds = Math.floor(remaining / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      host.replaceChildren(
+        unit(days, days === 1 ? 'DAY' : 'DAYS'),
+        unit(hours, 'HOURS'),
+        unit(minutes, 'MIN'),
+        unit(seconds, 'SEC')
+      );
+      host.setAttribute('aria-label', `${days} days, ${hours} hours, ${minutes} minutes and ${seconds} seconds until release`);
+
+      if (remaining <= 0) {
+        if (homepageCountdownTimer) window.clearInterval(homepageCountdownTimer);
+        homepageCountdownTimer = null;
+        window.setTimeout(() => location.reload(), 900);
+      }
+    };
+
+    update();
+    if (target > Date.now()) homepageCountdownTimer = window.setInterval(update, 1000);
   }
   function releaseSlug(release) {
     return words(release.slug).trim() || words(release.title).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -496,8 +558,9 @@
     const date = validDate(release.releaseDate);
     const dateText = date ? new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date).toUpperCase() : release.releaseDate;
     body.append(node('p', 'release-date', dateText));
-    const remaining = daysUntil(release.releaseDate);
-    if (remaining !== null) body.append(node('p', 'release-countdown', `${remaining} ${remaining === 1 ? 'day' : 'days'} ${settings.upcoming.countdownLabel}`));
+    const countdown = node('div', 'release-countdown');
+    body.append(countdown);
+    startHomepageCountdown(countdown, release.releaseDate);
     const action = node('a', 'button button-accent', settings.upcoming.presaveLabel);
     action.href = releasePageUrl(release);
     body.append(action);
