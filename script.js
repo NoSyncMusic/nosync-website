@@ -369,6 +369,7 @@
     if (settings.hero.suffix) byId('artist-name').append(node('span', 'title-suffix', settings.hero.suffix));
     byId('artist-name').setAttribute('aria-label', `${lines.join(' ') || settings.artistName}${settings.hero.suffix}`);
     setText('tagline', settings.hero.tagline);
+    byId('tagline').hidden = !words(settings.hero.tagline).trim();
     setText('genres', settings.hero.genres);
     setText('hero-intro', settings.hero.intro);
     byId('hero-intro').hidden = !settings.hero.intro.trim();
@@ -586,19 +587,46 @@
     card.append(cover, body);
     host.append(card);
   }
+  function officialReleaseCount(content) {
+    const today = todayInAmsterdam();
+    const manual = rows(content.releases).filter((release) => release.visible !== false);
+    const releasedUpcoming = rows(content.upcomingReleases)
+      .filter((release) => release.visible !== false && validDate(release.releaseDate)
+        && (words(release.status, 'upcoming') === 'released' || release.releaseDate <= today))
+      .map(releaseFromUpcoming);
+
+    const keys = new Set();
+    [...manual, ...releasedUpcoming].forEach((release) => keys.add(releaseIdentity(release)));
+    return keys.size;
+  }
+
+  function roundedReleaseStat(count) {
+    if (!Number.isFinite(count) || count <= 0) return '0';
+    if (count < 5) return String(count);
+    return `${Math.floor(count / 5) * 5}+`;
+  }
+
   function renderHighlights(content) {
     const host = byId('credibility-strip');
     if (!host) return;
     host.replaceChildren();
-    rows(content.highlights).slice(0, 3).forEach((item) => {
+
+    const stats = record(content.stats) ? content.stats : {};
+    const items = [
+      { label: words(stats.totalStreamsLabel, 'Total streams'), value: words(stats.totalStreams, '100K+') },
+      { label: words(stats.officialReleasesLabel, 'Official releases'), value: roundedReleaseStat(officialReleaseCount(content)) },
+      { label: words(stats.countriesStreamingLabel, 'Countries streaming'), value: words(stats.countriesStreaming, '50+') }
+    ];
+
+    items.forEach((item) => {
       const block = node('div', 'credibility-item');
       block.append(
-        node('span', 'credibility-label', words(item.label)),
-        node('strong', 'credibility-value', words(item.value))
+        node('span', 'credibility-label', item.label),
+        node('strong', 'credibility-value', item.value)
       );
       host.append(block);
     });
-    host.hidden = host.childElementCount === 0;
+    host.hidden = false;
   }
 
   function createExploreCard(link) {
