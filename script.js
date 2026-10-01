@@ -334,7 +334,7 @@
   }
   function releasePageUrl(release) {
     const slug = releaseSlug(release);
-    return slug ? `presave/${encodeURIComponent(slug)}/` : '#';
+    return slug ? `presave/?release=${encodeURIComponent(slug)}` : '#';
   }
   function releaseIdentity(release) {
     const clean = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
