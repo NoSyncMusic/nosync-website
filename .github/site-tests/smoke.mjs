@@ -84,6 +84,25 @@ for (const config of matrix) {
     await page.goto(`${base}/releases/`, { waitUntil: 'domcontentloaded' });
     await page.locator('#all-releases .stream-here-button').first().waitFor();
     await assertNoHorizontalOverflow(page, `${config.name} releases`);
+
+    await page.locator('#release-view-grid').click();
+    assert.equal(await page.locator('#all-releases').getAttribute('data-view'), 'grid',
+      `${config.name}: grid view did not activate`);
+    assert.equal(await page.locator('.release-year-group').count(), 0,
+      `${config.name}: year groups still visible in grid view`);
+    await assertNoHorizontalOverflow(page, `${config.name} releases grid`);
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.locator('#all-releases .stream-here-button').first().waitFor();
+    assert.equal(await page.locator('#release-view-grid').getAttribute('aria-pressed'), 'true',
+      `${config.name}: saved grid preference was not restored`);
+
+    await page.locator('#release-view-year').click();
+    assert.equal(await page.locator('#all-releases').getAttribute('data-view'), 'year',
+      `${config.name}: year view did not activate`);
+    assert.ok(await page.locator('.release-year-group').count() > 0,
+      `${config.name}: year groups missing in year view`);
+    await assertNoHorizontalOverflow(page, `${config.name} releases year`);
     await openAndCheckModal(page, '#all-releases .stream-here-button', `${config.name} releases`);
 
     await page.goto(`${base}/presave/`, { waitUntil: 'domcontentloaded' });
