@@ -1,6 +1,7 @@
 {
   "artistName": "No Sync",
   "pageTitle": "No Sync — DJ & Producer",
+  "description": "No Sync is a Dutch DJ and producer making Bass House and Tech House. Explore releases, DJ sets, playlists and upcoming shows.",
   "hero": {
     "title": "NO\nSYNC",
     "tagline": "DJ / PRODUCER",
@@ -9,9 +10,7 @@
     "logo": "media/logo.webp",
     "photoCaption": "NO SYNC / THE NETHERLANDS",
     "listenButton": "Listen now",
-    "bookingButton": "Bookings & press",
-    "suffix": "",
-    "intro": ""
+    "bookingButton": "Bookings & press"
   },
   "navigation": {
     "music": "Music",
@@ -22,21 +21,30 @@
   "music": {
     "eyebrow": "TURN IT UP",
     "title": "Releases.",
-    "morePlatformsLabel": "More platforms",
+    "allReleasesLabel": "All releases",
+    "allReleasesEyebrow": "DISCOGRAPHY",
+    "allReleasesTitle": "All releases.",
     "streamHereLabel": "Stream here",
     "streamModalTitle": "Choose your platform",
     "streamModalEyebrow": "LISTEN NOW",
     "openPlatformLabel": "Open ↗",
-    "closeModalLabel": "Close",
-    "allReleasesLabel": "All releases",
-    "allReleasesEyebrow": "DISCOGRAPHY",
-    "allReleasesTitle": "All releases."
+    "closeModalLabel": "Close"
+  },
+  "upcoming": {
+    "eyebrow": "COMING SOON",
+    "title": "Next release.",
+    "presaveLabel": "Pre-save",
+    "releasedLabel": "Listen on all platforms",
+    "followNote": "Pre-save on your preferred service. Follow actions are offered by the connected provider where that service supports them.",
+    "countdownLabel": "until release",
+    "servicesLabel": "Pre-save available on"
   },
   "links": {
     "eyebrow": "BEYOND THE RELEASES",
     "title": "In the mix."
   },
   "shows": {
+    "source": "bandsintown",
     "eyebrow": "SEE YOU THERE",
     "title": "Upcoming shows.",
     "bandsintownLabel": "Follow on Bandsintown",
@@ -44,9 +52,8 @@
     "soldOutLabel": "Sold out",
     "moreInfoLabel": "Details coming soon",
     "emptyMessage": "New dates coming soon. Follow on Bandsintown for show updates.",
-    "defaultTitle": "No Sync live",
+    "defaultTitle": "TBA",
     "venuePendingLabel": "Venue to be announced",
-    "source": "bandsintown",
     "loadingLabel": "Loading shows…",
     "fallbackLabel": "View upcoming shows on Bandsintown"
   },
@@ -68,15 +75,5 @@
     "buttonText": "#101010",
     "surface": "#191919",
     "borders": "#333333"
-  },
-  "description": "No Sync is a Dutch DJ and producer making Bass House and Tech House. Explore releases, DJ sets, playlists and upcoming shows.",
-  "upcoming": {
-    "eyebrow": "COMING SOON",
-    "title": "Next release.",
-    "presaveLabel": "Pre-save",
-    "releasedLabel": "Listen on all platforms",
-    "followNote": "Pre-save on your preferred service. Follow actions are offered by the connected provider where that service supports them.",
-    "countdownLabel": "until release",
-    "servicesLabel": "Pre-save available on"
   }
 }
