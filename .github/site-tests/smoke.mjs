@@ -79,11 +79,24 @@ for (const config of matrix) {
     await page.goto(`${base}/index.html`, { waitUntil: 'domcontentloaded' });
     await page.locator('#featured .stream-here-button').waitFor();
     await assertNoHorizontalOverflow(page, `${config.name} homepage`);
+    if (config.name === 'Chromium desktop') {
+      const stats = page.locator('#credibility-strip');
+      await stats.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(1100);
+      const statValues = await page.locator('.credibility-value[data-stat-target]').evaluateAll((elements) =>
+        elements.map((element) => ({ text: element.textContent, target: element.dataset.statTarget }))
+      );
+      assert.equal(statValues.length, 3, 'Homepage should render three animated statistics');
+      assert.ok(statValues.every((item) => item.text === item.target),
+        `Homepage statistics did not finish at their targets: ${JSON.stringify(statValues)}`);
+    }
     await openAndCheckModal(page, '#featured .stream-here-button', `${config.name} homepage`);
 
     await page.goto(`${base}/releases/`, { waitUntil: 'domcontentloaded' });
     await page.locator('#all-releases .stream-here-button').first().waitFor();
     await assertNoHorizontalOverflow(page, `${config.name} releases`);
+    assert.equal(await page.locator('#release-view-grid').getAttribute('aria-pressed'), 'true',
+      `${config.name}: grid is not the default release view`);
 
     await page.locator('#release-view-grid').click();
     assert.equal(await page.locator('#all-releases').getAttribute('data-view'), 'grid',
