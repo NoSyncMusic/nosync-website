@@ -319,7 +319,7 @@ content:
     - name: slug
       label: URL-naam
       type: string
-      description: Alleen kleine letters, cijfers en streepjes. Bijvoorbeeld push. De pagina wordt /presave/push/.
+      description: Alleen kleine letters, cijfers en streepjes. Bijvoorbeeld push. De pre-save opent via /presave/?release=push.
       pattern:
         regex: ^[a-z0-9]+(?:-[a-z0-9]+)*$
         message: Gebruik alleen kleine letters, cijfers en streepjes.
