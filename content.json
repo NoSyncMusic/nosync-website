@@ -252,27 +252,7 @@
       "note": "SoundCloud, Demmo or Dropbox links only."
     }
   ],
-  "upcomingReleases": [
-    {
-      "title": "Push — Test Pre-release",
-      "artist": "No Sync",
-      "slug": "push-test",
-      "releaseDate": "2026-10-09",
-      "artwork": "media/logo.webp",
-      "featured": true,
-      "visible": true,
-      "status": "upcoming",
-      "enabledServices": [
-        "SPOTIFY",
-        "APPLE_MUSIC",
-        "YOUTUBE_MUSIC",
-        "DEEZER",
-        "AMAZON_MUSIC",
-        "BEATPORT"
-      ],
-      "links": []
-    }
-  ],
+  "upcomingReleases": [],
   "highlights": [
     {
       "value": "DJ / PRODUCER",
