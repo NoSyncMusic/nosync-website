@@ -178,7 +178,7 @@
       'contact-eyebrow': settings.contact.eyebrow, 'contact-title': settings.contact.title, 'presskit': settings.contact.presskitLabel,
       'footer-name': settings.footer.name, 'back-to-top': settings.footer.backToTop
     })) setText(id, value);
-    setText('year', String(new Date().getFullYear()));
+    setText('year', currentYearInAmsterdam());
   }
   function validDate(value) {
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
@@ -189,6 +189,9 @@
     const parts = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
     const part = (type) => parts.find((entry) => entry.type === type).value;
     return `${part('year')}-${part('month')}-${part('day')}`;
+  }
+  function currentYearInAmsterdam() {
+    return new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric' }).format(new Date());
   }
   function renderShows(content, settings) {
     const list = byId('show-list');
