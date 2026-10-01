@@ -64,34 +64,129 @@
     return rows(value).map((link) => ({ ...link, url: webUrl(link.url) })).filter((link) => link.url)
       .sort((a, b) => rank(a.type) - rank(b.type));
   }
-  function platformButtons(links, title, featured, label) {
-    const group = node('div', 'platforms');
-    const primaryCount = featured ? 3 : 2;
-    const make = (link) => externalLink(link.url, platformLabel(link), 'platform-link', `${title} — ${platformLabel(link)}`);
-    links.slice(0, primaryCount).forEach((link) => group.append(make(link)));
-    if (links.length > primaryCount) {
-      const details = node('details', 'more-platforms');
-      details.append(node('summary', '', label));
-      const extra = node('div', 'extra-platforms');
-      links.slice(primaryCount).forEach((link) => extra.append(make(link)));
-      details.append(extra);
-      group.append(details);
-    }
-    return group;
+  let streamModalReturnFocus = null;
+
+  function uniqueLinks(value) {
+    const seen = new Set();
+    return orderedLinks(value).filter((link) => {
+      const key = `${link.type || ''}|${link.url}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
+
+  function closeStreamModal() {
+    const modal = byId('stream-modal');
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove('stream-modal-open');
+    const target = streamModalReturnFocus;
+    streamModalReturnFocus = null;
+    if (target && document.contains(target)) target.focus();
+  }
+
+  function ensureStreamModal() {
+    let modal = byId('stream-modal');
+    if (modal) return modal;
+    modal = node('div', 'stream-modal');
+    modal.id = 'stream-modal';
+    modal.hidden = true;
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeStreamModal();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (modal.hidden) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeStreamModal();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...modal.querySelectorAll('a[href], button:not([disabled])')].filter((item) => !item.hidden);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+    document.body.append(modal);
+    return modal;
+  }
+
+  function openStreamModal(release, settings) {
+    const links = uniqueLinks(release.links);
+    if (!links.length) return;
+    const modal = ensureStreamModal();
+    const title = words(release.title, 'No Sync release');
+    const panel = node('section', 'stream-modal-panel');
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-labelledby', 'stream-modal-title');
+
+    const header = node('div', 'stream-modal-header');
+    header.append(node('p', 'eyebrow', settings.music.streamModalEyebrow));
+    const close = node('button', 'stream-modal-close', '×');
+    close.type = 'button';
+    close.setAttribute('aria-label', settings.music.closeModalLabel);
+    close.addEventListener('click', closeStreamModal);
+    header.append(close);
+
+    const releaseRow = node('div', 'stream-modal-release');
+    const art = node('div', 'stream-modal-art');
+    art.append(artwork(release.artwork));
+    const copy = node('div', 'stream-modal-copy');
+    const heading = node('h2', '', title);
+    heading.id = 'stream-modal-title';
+    copy.append(heading, node('p', 'release-artist', words(release.artist)));
+    releaseRow.append(art, copy);
+
+    const servicesTitle = node('p', 'stream-modal-services-title', settings.music.streamModalTitle);
+    const services = node('div', 'stream-service-list');
+    links.forEach((link) => {
+      const label = platformLabel(link);
+      const service = externalLink(link.url, undefined, 'stream-service', `${title} — ${label}`);
+      service.append(node('span', 'stream-service-name', label), node('span', 'stream-service-action', settings.music.openPlatformLabel));
+      services.append(service);
+    });
+
+    panel.append(header, releaseRow, servicesTitle, services);
+    modal.replaceChildren(panel);
+    streamModalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    modal.hidden = false;
+    document.body.classList.add('stream-modal-open');
+    close.focus();
+  }
+
   function releaseCard(release, featured, settings) {
     const card = node('article', featured ? 'featured-release' : 'release-card');
-    const links = orderedLinks(release.links);
+    const links = uniqueLinks(release.links);
     const title = words(release.title, 'No Sync release');
-    const cover = links.length ? externalLink(links[0].url, undefined, 'release-art', `Listen to ${title}`) : node('div', 'release-art');
+    const cover = links.length ? node('button', 'release-art release-art-button') : node('div', 'release-art');
+    if (links.length) {
+      cover.type = 'button';
+      cover.setAttribute('aria-label', `${settings.music.streamHereLabel} — ${title}`);
+      cover.addEventListener('click', () => openStreamModal(release, settings));
+    }
     cover.append(artwork(release.artwork));
     const body = node('div', 'release-body');
     if (featured && words(release.badge).trim()) body.append(node('p', 'release-badge', release.badge));
     body.append(node('h3', '', title), node('p', 'release-artist', words(release.artist)));
-    body.append(platformButtons(links, title, featured, settings.music.morePlatformsLabel));
+    if (links.length) {
+      const action = node('button', 'button button-accent stream-here-button', settings.music.streamHereLabel);
+      action.type = 'button';
+      action.addEventListener('click', () => openStreamModal(release, settings));
+      body.append(action);
+    }
     card.append(cover, body);
     return card;
   }
+
   function hex(value) {
     const match = words(value).trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
     if (!match) return '';
@@ -241,6 +336,26 @@
     const slug = releaseSlug(release);
     return slug ? `presave/${encodeURIComponent(slug)}/` : '#';
   }
+  function releaseIdentity(release) {
+    const clean = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
+    return `${clean(release.title)}|${clean(release.artist)}`;
+  }
+  function releaseFromUpcoming(release) {
+    const links = [...rows(release.links)];
+    const smartLink = webUrl(release.smartLinkUrl) || webUrl(release.presaveUrl);
+    const spotify = webUrl(release.spotifyUrl);
+    if (smartLink) links.unshift({ type: 'SMART_LINK', url: smartLink });
+    if (spotify) links.push({ type: 'SPOTIFY', url: spotify });
+    return {
+      title: words(release.spotifyTitle, words(release.title, 'New release')),
+      artist: words(release.spotifyArtist, words(release.artist)),
+      artwork: words(release.spotifyArtwork, words(release.artwork)),
+      badge: 'OUT NOW',
+      visible: release.visible !== false,
+      links,
+      _releaseDate: words(release.spotifyReleaseDate, words(release.releaseDate))
+    };
+  }
   function renderUpcoming(content, settings) {
     const section = byId('upcoming');
     const host = byId('upcoming-release');
@@ -248,11 +363,8 @@
     host.replaceChildren();
     const today = todayInAmsterdam();
     const list = rows(content.upcomingReleases)
-      .filter((release) => release.visible !== false && words(release.status, 'upcoming') !== 'released' && validDate(release.releaseDate) && release.releaseDate >= today)
-      .sort((a, b) => {
-        const featured = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
-        return featured || a.releaseDate.localeCompare(b.releaseDate);
-      });
+      .filter((release) => release.visible !== false && words(release.status, 'upcoming') !== 'released' && validDate(release.releaseDate) && release.releaseDate > today)
+      .sort((a, b) => a.releaseDate.localeCompare(b.releaseDate) || Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
     const release = list[0];
     section.hidden = !release;
     if (!release) return;
@@ -287,8 +399,26 @@
     });
     const spotify = rows(content.socials).find((social) => social.type === 'SPOTIFY' && webUrl(social.url));
     updateExternal('spotify-profile', spotify?.url);
-    const releases = rows(content.releases).filter((release) => release.visible !== false);
-    const featured = releases.find((release) => release.featured) || releases[0];
+    const today = todayInAmsterdam();
+    const manualReleases = rows(content.releases).filter((release) => release.visible !== false);
+    const automaticReleases = rows(content.upcomingReleases)
+      .filter((release) => release.visible !== false && validDate(release.releaseDate)
+        && (words(release.status, 'upcoming') === 'released' || release.releaseDate <= today))
+      .map(releaseFromUpcoming)
+      .sort((a, b) => words(b._releaseDate).localeCompare(words(a._releaseDate)));
+    const releases = [...manualReleases];
+    automaticReleases.slice().reverse().forEach((automatic) => {
+      const key = releaseIdentity(automatic);
+      const existingIndex = releases.findIndex((release) => releaseIdentity(release) === key);
+      if (existingIndex >= 0) {
+        const existing = releases.splice(existingIndex, 1)[0];
+        releases.unshift({ ...existing, ...automatic, links: [...rows(existing.links), ...rows(automatic.links)] });
+      } else releases.unshift(automatic);
+    });
+    const automaticFeatured = automaticReleases[0]
+      ? releases.find((release) => releaseIdentity(release) === releaseIdentity(automaticReleases[0]))
+      : null;
+    const featured = automaticFeatured || releases.find((release) => release.featured) || releases[0];
     byId('featured').replaceChildren();
     byId('releases').replaceChildren();
     if (featured) byId('featured').append(releaseCard(featured, true, settings));
@@ -338,6 +468,11 @@
     } finally { clearTimeout(timeout); }
   }
   const snapshot = JSON.parse(byId('published-data').textContent);
+  snapshot.settings.music.streamHereLabel = snapshot.settings.music.streamHereLabel || 'Stream here';
+  snapshot.settings.music.streamModalTitle = snapshot.settings.music.streamModalTitle || 'Choose your platform';
+  snapshot.settings.music.streamModalEyebrow = snapshot.settings.music.streamModalEyebrow || 'LISTEN NOW';
+  snapshot.settings.music.openPlatformLabel = snapshot.settings.music.openPlatformLabel || 'Open ↗';
+  snapshot.settings.music.closeModalLabel = snapshot.settings.music.closeModalLabel || 'Close';
   snapshot.settings.upcoming = snapshot.settings.upcoming || {
     eyebrow: 'COMING SOON',
     title: 'Next release.',
