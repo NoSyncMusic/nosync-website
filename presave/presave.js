@@ -157,7 +157,8 @@
       const release = releases.find((item) => item && item.visible !== false && (words(item.slug) === requested || slugify(item.title) === requested));
       if (!release) throw new Error('This pre-save is not available.');
 
-      const released = words(release.status, 'upcoming') === 'released';
+      const released = words(release.status, 'upcoming') === 'released'
+        || (validDate(release.releaseDate) && release.releaseDate <= todayInAmsterdam());
       const title = words(release.spotifyTitle, words(release.title, 'New release'));
       const artist = words(release.spotifyArtist, words(release.artist, 'No Sync'));
       const smartLink = webUrl(release.smartLinkUrl) || webUrl(release.presaveUrl);
