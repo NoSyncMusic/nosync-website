@@ -31,6 +31,7 @@ async function openAndCheckModal(page, trigger, label) {
   await page.locator(trigger).first().click();
   const modal = page.locator('.stream-modal.is-open');
   await modal.waitFor({ state: 'visible' });
+  await page.waitForTimeout(320);
   const geometry = await page.evaluate(() => {
     const panel = document.querySelector('.stream-modal-panel');
     const rect = panel.getBoundingClientRect();
