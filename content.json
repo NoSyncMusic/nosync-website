@@ -33,6 +33,7 @@
     {
       "title": "I Just Wanna Know",
       "artist": "Urban Dolhar & No Sync",
+      "releaseDate": "2026-10-01",
       "artwork": "media/i-just-wanna-know.webp",
       "featured": true,
       "badge": "OUT NOW",
@@ -79,6 +80,7 @@
     {
       "title": "Hold Me Closer",
       "artist": "James O'Hea & No Sync",
+      "releaseDate": "2026-10-01",
       "artwork": "media/hold-me-closer.webp",
       "featured": false,
       "badge": "OUT NOW",
@@ -105,6 +107,7 @@
     {
       "title": "Move (Your Body)",
       "artist": "No Sync",
+      "releaseDate": "2026-10-01",
       "artwork": "media/move-your-body.webp",
       "featured": false,
       "badge": "OUT NOW",
@@ -131,6 +134,7 @@
     {
       "title": "In Your Eyes",
       "artist": "No Sync",
+      "releaseDate": "2026-10-01",
       "artwork": "media/in-your-eyes.webp",
       "featured": false,
       "badge": "OUT NOW",
@@ -157,6 +161,7 @@
     {
       "title": "Vuurballon - No Sync Remix",
       "artist": "BREDDEX & No Sync",
+      "releaseDate": "2026-10-01",
       "artwork": "media/vuurballon-no-sync-remix.webp",
       "featured": false,
       "badge": "OUT NOW",
@@ -185,7 +190,7 @@
     {
       "title": "Submit your track",
       "subtitle": "Send your release for playlist consideration.",
-      "url": "https://pitchplaylists.com/submit-public-page/6a84ba90c9c40e3c46b98167",
+      "url": "https://pitchplaylists.com/cur/1183423373",
       "image": "media/link-1.webp",
       "visible": true
     },
@@ -242,6 +247,5 @@
       "email": "demo@nosyncmusic.com",
       "note": "SoundCloud, Demmo or Dropbox links only."
     }
-  ],
-  "upcomingReleases": []
+  ]
 }
