@@ -289,6 +289,7 @@ body.stream-modal-open { overflow: hidden; }
 .releases-archive-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 34px; }
 .releases-archive-copy { max-width: 680px; }
 .releases-archive-copy .eyebrow { margin-bottom: 8px; }
+.releases-archive-copy h1 { font-size: clamp(52px, 7vw, 82px); line-height: .96; white-space: nowrap; }
 .releases-archive-intro { margin-top: 14px; color: var(--secondary); max-width: 54ch; }
 .all-releases-grid { margin-top: 0; }
 .archive-status { color: var(--secondary); padding-block: 28px; }
@@ -296,5 +297,6 @@ body.stream-modal-open { overflow: hidden; }
 @media (max-width: 640px) {
   .releases-archive { padding-block: 36px 52px; }
   .releases-archive-head { align-items: flex-start; flex-direction: column; margin-bottom: 26px; }
+  .releases-archive-copy h1 { font-size: clamp(44px, 13vw, 62px); white-space: nowrap; }
   .archive-back { width: fit-content; }
 }
