@@ -23,7 +23,12 @@
     "eyebrow": "TURN IT UP",
     "title": "Releases.",
     "spotifyLabel": "More on Spotify",
-    "morePlatformsLabel": "More platforms"
+    "morePlatformsLabel": "More platforms",
+    "streamHereLabel": "Stream here",
+    "streamModalTitle": "Choose your platform",
+    "streamModalEyebrow": "LISTEN NOW",
+    "openPlatformLabel": "Open ↗",
+    "closeModalLabel": "Close"
   },
   "links": {
     "eyebrow": "BEYOND THE RELEASES",
@@ -66,7 +71,7 @@
   "upcoming": {
     "eyebrow": "COMING SOON",
     "title": "Next release.",
-    "presaveLabel": "Choose your platform",
+    "presaveLabel": "Pre-save",
     "releasedLabel": "Listen on all platforms",
     "followNote": "Pre-save on your preferred service. Follow actions are offered by the connected provider where that service supports them.",
     "countdownLabel": "until release",
