@@ -47,10 +47,14 @@ jobs:
           import YAML from 'yaml';
           const source = fs.readFileSync('.pages.yml', 'utf8');
           const parsed = YAML.parse(source);
-          if (!parsed || !Array.isArray(parsed.content) || parsed.content.length < 2) {
-            throw new Error('Pages CMS config is missing expected content entries.');
+          const flatten = (entries = []) => entries.flatMap((entry) =>
+            entry?.type === 'group' ? flatten(Array.isArray(entry.items) ? entry.items : []) : [entry]);
+          const entries = parsed && Array.isArray(parsed.content) ? flatten(parsed.content) : [];
+          const names = new Set(entries.map((entry) => entry?.name));
+          if (!names.has('appearance') || !names.has('homepage')) {
+            throw new Error('Pages CMS config is missing the appearance or homepage editor.');
           }
-          console.log('Pages CMS configuration is valid YAML.');
+          console.log('Pages CMS configuration is valid YAML and contains the expected editors.');
           NODE
 
       - name: Install Playwright browsers
