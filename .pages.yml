@@ -669,6 +669,10 @@ content:
         label: Toelichting
         type: text
 
+settings:
+  content:
+    merge: true
+
 actions:
 - name: publish-namecheap
   label: Publiceer naar Namecheap
