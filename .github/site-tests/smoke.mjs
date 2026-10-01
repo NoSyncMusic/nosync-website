@@ -34,13 +34,23 @@ async function openAndCheckModal(page, trigger, label) {
   await page.waitForTimeout(320);
   const geometry = await page.evaluate(() => {
     const panel = document.querySelector('.stream-modal-panel');
+    const modal = document.querySelector('.stream-modal');
     const rect = panel.getBoundingClientRect();
+    const modalRect = modal.getBoundingClientRect();
     const viewport = window.visualViewport;
     const top = viewport?.offsetTop ?? 0;
     const height = viewport?.height ?? window.innerHeight;
+    const modalStyle = getComputedStyle(modal);
     return {
       panelTop: rect.top,
       panelBottom: rect.bottom,
+      modalTop: modalRect.top,
+      modalBottom: modalRect.bottom,
+      modalHeight: modalStyle.height,
+      modalVarHeight: modalStyle.getPropertyValue('--modal-vv-height').trim(),
+      viewportHeight: viewport?.height ?? null,
+      innerHeight: window.innerHeight,
+      clientHeight: document.documentElement.clientHeight,
       viewportTop: top,
       viewportBottom: top + height,
       bodyPosition: getComputedStyle(document.body).position,
