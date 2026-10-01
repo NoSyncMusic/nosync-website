@@ -95,6 +95,11 @@
     if (!date) return '';
     return `Released ${new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date)}`;
   }
+  function formatCardDate(value) {
+    const date = validDate(value);
+    if (!date) return '';
+    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date).toUpperCase();
+  }
   function releaseIdentity(release) {
     const clean = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
     return `${clean(release.title)}|${clean(release.artist)}`;
@@ -133,7 +138,7 @@
         releases.unshift({ ...existing, ...automaticRelease, links: [...rows(existing.links), ...rows(automaticRelease.links)] });
       } else releases.unshift(automaticRelease);
     });
-    return releases;
+    return releases.sort((a, b) => words(b.releaseDate, words(b._releaseDate)).localeCompare(words(a.releaseDate, words(a._releaseDate))));
   }
   function setModalBackgroundInert(modal, enabled) {
     [...document.body.children].forEach((child) => {
@@ -326,6 +331,8 @@
     cover.append(artwork(release.artwork));
     const body = node('div', 'release-body');
     body.append(node('h3', '', title), node('p', 'release-artist', words(release.artist)));
+    const dateText = formatCardDate(words(release.releaseDate, words(release._releaseDate)));
+    if (dateText) body.append(node('p', 'release-card-date', dateText));
     if (links.length) {
       const action = node('button', 'button button-accent stream-here-button', words(settings?.music?.streamHereLabel, 'Stream here'));
       action.type = 'button';
@@ -397,7 +404,25 @@
       const releases = allReleases(content);
       const host = byId('all-releases');
       host.replaceChildren();
-      releases.forEach((release) => host.append(releaseCard(release, settings)));
+      const groups = new Map();
+      releases.forEach((release) => {
+        const date = words(release.releaseDate, words(release._releaseDate));
+        const year = validDate(date) ? date.slice(0, 4) : 'Other';
+        if (!groups.has(year)) groups.set(year, []);
+        groups.get(year).push(release);
+      });
+      groups.forEach((items, year) => {
+        const section = node('section', 'release-year-group');
+        const head = node('div', 'release-year-head');
+        head.append(
+          node('h2', 'release-year-title', year),
+          node('span', 'release-year-count', `${items.length} ${items.length === 1 ? 'release' : 'releases'}`)
+        );
+        const grid = node('div', 'release-grid all-releases-grid');
+        items.forEach((release) => grid.append(releaseCard(release, settings)));
+        section.append(head, grid);
+        host.append(section);
+      });
       byId('archive-status').hidden = releases.length > 0;
       if (!releases.length) byId('archive-status').textContent = 'No releases available yet.';
     } catch (error) {
