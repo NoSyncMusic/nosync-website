@@ -89,7 +89,16 @@ for (const upcoming of data.upcomingReleases) {
   }
 
   const existingLinks = Array.isArray(existing?.links) ? existing.links.filter((link) => link && typeof link === 'object') : [];
-  const links = existingLinks.filter((link) => !['SPOTIFY', 'SMART_LINK'].includes(link.type));
+  const upcomingLinks = Array.isArray(upcoming?.links) ? upcoming.links.filter((link) => link && typeof link === 'object') : [];
+  const seenLinks = new Set();
+  const links = [...existingLinks, ...upcomingLinks]
+    .filter((link) => !['SPOTIFY', 'SMART_LINK'].includes(link.type))
+    .filter((link) => {
+      const key = `${link.type || ''}|${link.url || ''}`;
+      if (!link.url || seenLinks.has(key)) return false;
+      seenLinks.add(key);
+      return true;
+    });
   if (upcoming.smartLinkUrl || upcoming.presaveUrl) {
     links.unshift({ type: 'SMART_LINK', url: upcoming.smartLinkUrl || upcoming.presaveUrl, label: 'All platforms' });
   }
