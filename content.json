@@ -192,28 +192,32 @@
       "subtitle": "Send your release for playlist consideration.",
       "url": "https://pitchplaylists.com/cur/1183423373",
       "image": "media/link-1.webp",
-      "visible": true
+      "visible": true,
+      "category": "FOR_ARTISTS"
     },
     {
       "title": "Stookhoksessies #452",
       "subtitle": "Listen to the full No Sync DJ set.",
       "url": "https://on.soundcloud.com/iCJ76i5EbnoTITB7kY",
       "image": "media/link-2.webp",
-      "visible": true
+      "visible": true,
+      "category": "DJ_SET"
     },
     {
       "title": "AFTERHOURS",
       "subtitle": "Best Dance 2026 · Curated by No Sync",
       "url": "https://open.spotify.com/playlist/4mn0Oxq9E6ewMXWpRuNkmw?si=f2465a4502064b3b",
       "image": "media/AFTERHOURS.webp",
-      "visible": true
+      "visible": true,
+      "category": "PLAYLIST"
     },
     {
       "title": "All I Need Is You — No Sync Remix",
       "subtitle": "Megisto feat. Myke Tyler · Free download",
       "url": "https://soundcloud.com/nosyncmusic/megisto-feat-myke-tyler-all-i?si=20c73729144942f1becafabe64c7b2bc&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
       "image": "media/link-4.webp",
-      "visible": true
+      "visible": true,
+      "category": "FREE_DOWNLOAD"
     }
   ],
   "shows": [
@@ -267,6 +271,20 @@
         "BEATPORT"
       ],
       "links": []
+    }
+  ],
+  "highlights": [
+    {
+      "value": "DJ / PRODUCER",
+      "label": "No Sync"
+    },
+    {
+      "value": "BASS HOUSE · DRUM & BASS",
+      "label": "Current sound"
+    },
+    {
+      "value": "THE NETHERLANDS",
+      "label": "Based in"
     }
   ]
 }
