@@ -253,18 +253,11 @@
     }
   ],
   "upcomingReleases": [],
-  "highlights": [
-    {
-      "value": "DJ / PRODUCER",
-      "label": "No Sync"
-    },
-    {
-      "value": "BASS HOUSE · TECH HOUSE · UK GARAGE",
-      "label": "Current sound"
-    },
-    {
-      "value": "THE NETHERLANDS",
-      "label": "Based in"
-    }
-  ]
+  "stats": {
+    "totalStreams": "100K+",
+    "totalStreamsLabel": "Total streams",
+    "countriesStreaming": "50+",
+    "countriesStreamingLabel": "Countries streaming",
+    "officialReleasesLabel": "Official releases"
+  }
 }
