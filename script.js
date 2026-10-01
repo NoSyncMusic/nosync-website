@@ -11,6 +11,8 @@
     AMAZON_MUSIC: 'Amazon Music', ANGHAMMI: 'Anghami', TIDAL: 'Tidal', AUDIOMACK: 'Audiomack', SMART_LINK: 'All platforms'
   };
   const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT'];
+  const HOME_RELEASE_LIMIT = 5;
+  const STREAM_MODAL_ANIMATION_MS = 260;
 
   function node(tag, className, text) {
     const result = document.createElement(tag);
@@ -78,12 +80,17 @@
 
   function closeStreamModal() {
     const modal = byId('stream-modal');
-    if (!modal || modal.hidden) return;
-    modal.hidden = true;
+    if (!modal || modal.hidden || modal.dataset.closing === 'true') return;
+    modal.dataset.closing = 'true';
+    modal.classList.remove('is-open');
     document.body.classList.remove('stream-modal-open');
     const target = streamModalReturnFocus;
     streamModalReturnFocus = null;
-    if (target && document.contains(target)) target.focus();
+    window.setTimeout(() => {
+      modal.hidden = true;
+      modal.dataset.closing = 'false';
+      if (target && document.contains(target)) target.focus();
+    }, STREAM_MODAL_ANIMATION_MS);
   }
 
   function ensureStreamModal() {
@@ -158,8 +165,10 @@
     panel.append(header, releaseRow, servicesTitle, services);
     modal.replaceChildren(panel);
     streamModalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    modal.dataset.closing = 'false';
     modal.hidden = false;
     document.body.classList.add('stream-modal-open');
+    requestAnimationFrame(() => modal.classList.add('is-open'));
     close.focus();
   }
 
@@ -267,7 +276,7 @@
       'listen-button': settings.hero.listenButton, 'booking-button': settings.hero.bookingButton,
       'nav-music': settings.navigation.music, 'nav-links': settings.navigation.explore,
       'nav-shows': settings.navigation.shows, 'nav-contact': settings.navigation.contact,
-      'music-eyebrow': settings.music.eyebrow, 'music-title': settings.music.title, 'spotify-profile': settings.music.spotifyLabel,
+      'music-eyebrow': settings.music.eyebrow, 'music-title': settings.music.title, 'all-releases-link': settings.music.allReleasesLabel,
       'links-eyebrow': settings.links.eyebrow, 'links-title': settings.links.title,
       'shows-eyebrow': settings.shows.eyebrow, 'shows-title': settings.shows.title, 'bandsintown': settings.shows.bandsintownLabel,
       'contact-eyebrow': settings.contact.eyebrow, 'contact-title': settings.contact.title, 'presskit': settings.contact.presskitLabel,
@@ -397,8 +406,6 @@
       const url = webUrl(social.url);
       if (url) byId('socials').append(externalLink(url, platformLabel(social), 'social-link'));
     });
-    const spotify = rows(content.socials).find((social) => social.type === 'SPOTIFY' && webUrl(social.url));
-    updateExternal('spotify-profile', spotify?.url);
     const today = todayInAmsterdam();
     const manualReleases = rows(content.releases).filter((release) => release.visible !== false);
     const automaticReleases = rows(content.upcomingReleases)
@@ -415,14 +422,15 @@
         releases.unshift({ ...existing, ...automatic, links: [...rows(existing.links), ...rows(automatic.links)] });
       } else releases.unshift(automatic);
     });
+    const homepageReleases = releases.slice(0, HOME_RELEASE_LIMIT);
     const automaticFeatured = automaticReleases[0]
-      ? releases.find((release) => releaseIdentity(release) === releaseIdentity(automaticReleases[0]))
+      ? homepageReleases.find((release) => releaseIdentity(release) === releaseIdentity(automaticReleases[0]))
       : null;
-    const featured = automaticFeatured || releases.find((release) => release.featured) || releases[0];
+    const featured = automaticFeatured || homepageReleases.find((release) => release.featured) || homepageReleases[0];
     byId('featured').replaceChildren();
     byId('releases').replaceChildren();
     if (featured) byId('featured').append(releaseCard(featured, true, settings));
-    releases.filter((release) => release !== featured).forEach((release) => byId('releases').append(releaseCard(release, false, settings)));
+    homepageReleases.filter((release) => release !== featured).forEach((release) => byId('releases').append(releaseCard(release, false, settings)));
     visibility('music', releases.length > 0);
     byId('listen-button').hidden = !releases.length;
     byId('link-grid').replaceChildren();
@@ -468,6 +476,9 @@
     } finally { clearTimeout(timeout); }
   }
   const snapshot = JSON.parse(byId('published-data').textContent);
+  snapshot.settings.music.allReleasesLabel = snapshot.settings.music.allReleasesLabel || 'All releases';
+  snapshot.settings.music.allReleasesEyebrow = snapshot.settings.music.allReleasesEyebrow || 'DISCOGRAPHY';
+  snapshot.settings.music.allReleasesTitle = snapshot.settings.music.allReleasesTitle || 'All releases.';
   snapshot.settings.music.streamHereLabel = snapshot.settings.music.streamHereLabel || 'Stream here';
   snapshot.settings.music.streamModalTitle = snapshot.settings.music.streamModalTitle || 'Choose your platform';
   snapshot.settings.music.streamModalEyebrow = snapshot.settings.music.streamModalEyebrow || 'LISTEN NOW';
