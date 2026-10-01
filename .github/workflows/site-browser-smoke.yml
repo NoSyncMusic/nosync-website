@@ -14,6 +14,7 @@ on:
       - "releases/**"
       - "presave/**"
       - ".github/site-tests/**"
+      - ".pages.yml"
       - ".github/workflows/site-browser-smoke.yml"
 
 permissions:
@@ -36,10 +37,24 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Playwright
+      - name: Install test dependencies
+        run: npm install --no-save playwright@1.55.0 yaml@2.8.1
+
+      - name: Validate Pages CMS configuration
         run: |
-          npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium firefox webkit
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import YAML from 'yaml';
+          const source = fs.readFileSync('.pages.yml', 'utf8');
+          const parsed = YAML.parse(source);
+          if (!parsed || !Array.isArray(parsed.content) || parsed.content.length < 2) {
+            throw new Error('Pages CMS config is missing expected content entries.');
+          }
+          console.log('Pages CMS configuration is valid YAML.');
+          NODE
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Start local site
         run: |
