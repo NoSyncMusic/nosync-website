@@ -3,7 +3,7 @@ media:
   output: media
 content:
 - name: appearance
-  label: Homepage & kleuren
+  label: Design, teksten & kleuren
   type: file
   path: settings.json
   format: json
@@ -34,6 +34,7 @@ content:
     - name: tagline
       label: Tekst boven de grote titel
       type: string
+      hidden: true
     - name: genres
       label: Tekst onder de grote titel
       type: string
@@ -293,7 +294,7 @@ content:
     description: Rood blijft een accent. Kleine accentteksten en knoptekst worden zo nodig aangepast voor
       leesbaar contrast. Controleer je eigen tekstkleuren na wijzigingen.
 - name: homepage
-  label: Muziek, links & contact
+  label: Content, releases & contact
   type: file
   path: content.json
   format: json
@@ -301,7 +302,10 @@ content:
   - name: socials
     label: Socials
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{type}"
     fields:
     - name: type
       label: Platform
@@ -346,9 +350,12 @@ content:
       label: Label countries streaming
       type: string
   - name: upcomingReleases
-    label: Aankomende releases
+    label: Aankomende releases & pre-saves
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{title} — {releaseDate}"
     description: Voeg een release één keer toe. Koppel een smartlink/pre-saveprovider zoals Feature.fm. Die provider kan de DSP-links op releasedag automatisch scannen en follow-acties uitvoeren waar ondersteund.
     fields:
     - name: slug
@@ -435,25 +442,34 @@ content:
     - name: spotifyTrackId
       label: Automatisch - Spotify Track ID
       type: string
+      readonly: true
     - name: spotifyUrl
       label: Automatisch - Spotify URL
       type: string
+      readonly: true
     - name: spotifyArtwork
       label: Automatisch - Spotify artwork
       type: string
+      readonly: true
     - name: spotifyTitle
       label: Automatisch - Spotify titel
       type: string
+      readonly: true
     - name: spotifyArtist
       label: Automatisch - Spotify artiesten
       type: string
+      readonly: true
     - name: spotifyReleaseDate
       label: Automatisch - Spotify releasedatum
       type: string
+      readonly: true
     - name: links
       label: Luisterlinks na release (optioneel)
       type: object
-      list: true
+      list:
+        collapsible:
+          collapsed: true
+          summary: "{type} {label}"
       description: Optioneel. Voeg directe streaminglinks toe; na de releasedatum verschijnen ze automatisch in de Stream Here-popup. De smartlink en Spotify-link blijven als fallback beschikbaar.
       fields:
       - name: type
@@ -482,9 +498,12 @@ content:
         type: string
         description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
   - name: releases
-    label: Releases
+    label: Uitgebrachte releases
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{title} — {artist}"
     fields:
     - name: title
       label: Titel
@@ -511,7 +530,10 @@ content:
     - name: links
       label: Streamingdiensten / luisterlinks
       type: object
-      list: true
+      list:
+        collapsible:
+          collapsed: true
+          summary: "{type} {label}"
       description: Deze links kun je altijd handmatig aanvullen of aanpassen. Iedere geldige link verschijnt automatisch in de Stream Here-popup.
       fields:
       - name: type
@@ -540,9 +562,12 @@ content:
         type: string
         description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
   - name: links
-    label: Sets, playlists en overige links
+    label: Explore: sets, playlists & downloads
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{title} — {category}"
     fields:
     - name: title
       label: Titel
@@ -574,7 +599,10 @@ content:
   - name: shows
     label: Shows
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{date} — {title}"
     fields:
     - name: date
       label: Datum (JJJJ-MM-DD)
@@ -611,9 +639,12 @@ content:
     type: string
     description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
   - name: contacts
-    label: Contactgegevens
+    label: Contactadressen
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{label} — {email}"
     fields:
     - name: label
       label: Categorie
