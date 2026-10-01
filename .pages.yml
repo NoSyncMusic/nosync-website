@@ -322,17 +322,28 @@ content:
     - name: label
       label: Eigen tekst voor deze link (optioneel)
       type: string
-  - name: highlights
-    label: Korte highlights onder de hero
+  - name: stats
+    label: Statistieken onder de hero
     type: object
-    list: true
-    description: Maximaal drie korte punten worden als rustige credibility-strip onder de hero getoond.
+    description: Total streams en countries streaming pas je handmatig aan. Official releases wordt automatisch uit de zichtbare releasecatalogus berekend en per 5 afgerond.
     fields:
-    - name: value
-      label: Hoofdtekst
+    - name: totalStreams
+      label: Total streams
       type: string
-    - name: label
-      label: Kleine toelichting
+      description: Bijvoorbeeld 100K+.
+    - name: totalStreamsLabel
+      label: Label total streams
+      type: string
+    - name: officialReleasesLabel
+      label: Label official releases
+      type: string
+      description: Het cijfer zelf wordt automatisch berekend uit Releases.
+    - name: countriesStreaming
+      label: Countries streaming
+      type: string
+      description: Bijvoorbeeld 50+.
+    - name: countriesStreamingLabel
+      label: Label countries streaming
       type: string
   - name: upcomingReleases
     label: Aankomende releases
