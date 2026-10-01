@@ -374,12 +374,13 @@ body.stream-modal-open { overflow: hidden; }
 .credibility-item:last-child { border-right: 0; }
 .credibility-value {
   display: block;
-  margin-top: 5px;
+  margin-top: 6px;
   color: var(--headings);
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 19px;
+  font-size: clamp(34px, 3vw, 46px);
   font-weight: 800;
-  letter-spacing: .025em;
+  line-height: .95;
+  letter-spacing: .015em;
 }
 .credibility-label {
   display: block;
@@ -578,7 +579,8 @@ body.stream-modal-open { overflow: hidden; }
     border-bottom: 1px solid var(--borders);
   }
   .credibility-item:last-child { border-bottom: 0; }
-  .credibility-label { margin-top: 1px; }
+  .credibility-label { margin-top: 0; }
+  .credibility-value { font-size: 32px; }
   .upcoming-release-card::before { width: 2px; }
   .link-group + .link-group { margin-top: 24px; }
   .show-row {
