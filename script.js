@@ -244,6 +244,8 @@
     const heading = node('h2', '', title);
     heading.id = 'stream-modal-title';
     copy.append(heading, node('p', 'release-artist', words(release.artist)));
+    const releaseDateText = formatReleaseDate(words(release.releaseDate, words(release._releaseDate)));
+    if (releaseDateText) copy.append(node('p', 'stream-modal-release-date', releaseDateText));
     releaseRow.append(art, copy);
 
     const servicesTitle = node('p', 'stream-modal-services-title', settings.music.streamModalTitle);
@@ -387,6 +389,11 @@
     const date = new Date(`${value}T12:00:00Z`);
     return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null;
   }
+  function formatReleaseDate(value) {
+    const date = validDate(value);
+    if (!date) return '';
+    return `Released ${new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date)}`;
+  }
   function todayInAmsterdam() {
     const parts = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
     const part = (type) => parts.find((entry) => entry.type === type).value;
@@ -460,6 +467,7 @@
       badge: 'OUT NOW',
       visible: release.visible !== false,
       links,
+      releaseDate: words(release.spotifyReleaseDate, words(release.releaseDate)),
       _releaseDate: words(release.spotifyReleaseDate, words(release.releaseDate))
     };
   }
