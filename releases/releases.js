@@ -12,6 +12,7 @@
   };
   const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT', 'OTHER'];
   const STREAM_MODAL_ANIMATION_MS = 260;
+  const RELEASE_VIEW_STORAGE_KEY = 'nosync-release-view';
   let streamModalReturnFocus = null;
   let streamModalCloseTimer = null;
   let streamModalScrollY = 0;
@@ -396,6 +397,64 @@
     if (!record(value)) throw new Error('Invalid release data');
     return value;
   }
+  function storedReleaseView() {
+    try {
+      const value = localStorage.getItem(RELEASE_VIEW_STORAGE_KEY);
+      return value === 'grid' || value === 'year' ? value : 'year';
+    } catch {
+      return 'year';
+    }
+  }
+
+  function saveReleaseView(view) {
+    try { localStorage.setItem(RELEASE_VIEW_STORAGE_KEY, view); } catch {}
+  }
+
+  function updateViewControls(view) {
+    const grid = byId('release-view-grid');
+    const year = byId('release-view-year');
+    if (!grid || !year) return;
+    const gridActive = view === 'grid';
+    grid.classList.toggle('is-active', gridActive);
+    year.classList.toggle('is-active', !gridActive);
+    grid.setAttribute('aria-pressed', String(gridActive));
+    year.setAttribute('aria-pressed', String(!gridActive));
+  }
+
+  function renderReleaseView(host, releases, settings, view) {
+    host.replaceChildren();
+    host.dataset.view = view;
+
+    if (view === 'grid') {
+      const grid = node('div', 'release-grid all-releases-grid release-grid-flat');
+      releases.forEach((release) => grid.append(releaseCard(release, settings)));
+      host.append(grid);
+      updateViewControls(view);
+      return;
+    }
+
+    const groups = new Map();
+    releases.forEach((release) => {
+      const date = words(release.releaseDate, words(release._releaseDate));
+      const year = validDate(date) ? date.slice(0, 4) : 'Other';
+      if (!groups.has(year)) groups.set(year, []);
+      groups.get(year).push(release);
+    });
+    groups.forEach((items, year) => {
+      const section = node('section', 'release-year-group');
+      const head = node('div', 'release-year-head');
+      head.append(
+        node('h2', 'release-year-title', year),
+        node('span', 'release-year-count', `${items.length} ${items.length === 1 ? 'release' : 'releases'}`)
+      );
+      const grid = node('div', 'release-grid all-releases-grid');
+      items.forEach((release) => grid.append(releaseCard(release, settings)));
+      section.append(head, grid);
+      host.append(section);
+    });
+    updateViewControls(view);
+  }
+
   async function init() {
     byId('archive-year').textContent = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric' }).format(new Date());
     try {
@@ -403,26 +462,18 @@
       applySettings(settings);
       const releases = allReleases(content);
       const host = byId('all-releases');
-      host.replaceChildren();
-      const groups = new Map();
-      releases.forEach((release) => {
-        const date = words(release.releaseDate, words(release._releaseDate));
-        const year = validDate(date) ? date.slice(0, 4) : 'Other';
-        if (!groups.has(year)) groups.set(year, []);
-        groups.get(year).push(release);
-      });
-      groups.forEach((items, year) => {
-        const section = node('section', 'release-year-group');
-        const head = node('div', 'release-year-head');
-        head.append(
-          node('h2', 'release-year-title', year),
-          node('span', 'release-year-count', `${items.length} ${items.length === 1 ? 'release' : 'releases'}`)
-        );
-        const grid = node('div', 'release-grid all-releases-grid');
-        items.forEach((release) => grid.append(releaseCard(release, settings)));
-        section.append(head, grid);
-        host.append(section);
-      });
+      let view = storedReleaseView();
+
+      const setView = (nextView) => {
+        view = nextView;
+        saveReleaseView(view);
+        renderReleaseView(host, releases, settings, view);
+      };
+
+      byId('release-view-grid')?.addEventListener('click', () => setView('grid'));
+      byId('release-view-year')?.addEventListener('click', () => setView('year'));
+      renderReleaseView(host, releases, settings, view);
+
       byId('archive-status').hidden = releases.length > 0;
       if (!releases.length) byId('archive-status').textContent = 'No releases available yet.';
     } catch (error) {
