@@ -1,0 +1,105 @@
+name: Publish to Namecheap
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: Pages CMS action payload
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: namecheap-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish tested commit
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Resolve Pages CMS commit
+        id: release
+        env:
+          PAGES_PAYLOAD: ${{ inputs.payload }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+
+          payload = json.loads(os.environ["PAGES_PAYLOAD"])
+          repository = payload.get("repository") or {}
+          owner = repository.get("owner", "")
+          repo = repository.get("repo", "")
+          actual = f"{owner}/{repo}"
+          expected = os.environ["EXPECTED_REPOSITORY"]
+          sha = repository.get("sha", "")
+
+          if payload.get("source") != "pages-cms":
+              raise SystemExit("This production workflow may only be started from Pages CMS.")
+          if actual.lower() != expected.lower():
+              raise SystemExit(f"Repository mismatch: {actual} != {expected}")
+          if not re.fullmatch(r"[0-9a-fA-F]{40}", sha):
+              raise SystemExit("Pages CMS did not provide a valid commit SHA.")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+              fh.write(f"sha={sha}\n")
+
+          print(f"Publishing exact tested commit: {sha}")
+          PY
+
+      - name: Checkout exact tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.sha }}
+          fetch-depth: 1
+
+      - name: Check Namecheap configuration
+        env:
+          FTP_HOST: ${{ secrets.NAMECHEAP_FTP_HOST }}
+          FTP_USER: ${{ secrets.NAMECHEAP_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
+        run: |
+          test -n "$FTP_HOST" || { echo "Missing secret NAMECHEAP_FTP_HOST"; exit 1; }
+          test -n "$FTP_USER" || { echo "Missing secret NAMECHEAP_FTP_USER"; exit 1; }
+          test -n "$FTP_PASSWORD" || { echo "Missing secret NAMECHEAP_FTP_PASSWORD"; exit 1; }
+
+      - name: Install secure FTP client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+
+      - name: Publish website to Namecheap
+        env:
+          FTP_HOST: ${{ secrets.NAMECHEAP_FTP_HOST }}
+          FTP_USER: ${{ secrets.NAMECHEAP_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
+        run: |
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "ftp://$FTP_HOST:21" -e '
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 30;
+            mirror --reverse --verbose --parallel=2               --exclude-glob .git/**               --exclude-glob .github/**               --exclude-glob .pages.yml               --exclude-glob README.md               --exclude-glob CMS-GUIDE.md               --exclude-glob NAMECHEAP-DEPLOY.md               --exclude-glob scripts/**               ./ /;
+            bye
+          '
+
+      - name: Publication summary
+        run: |
+          {
+            echo "### Namecheap publication completed"
+            echo ""
+            echo "- Repository: `${{ github.repository }}`"
+            echo "- Published commit: `${{ steps.release.outputs.sha }}`"
+            echo "- Trigger: Pages CMS production button"
+            echo ""
+            echo "The GitHub Pages preview remains unchanged and can continue to be used for testing."
+          } >> "$GITHUB_STEP_SUMMARY"
