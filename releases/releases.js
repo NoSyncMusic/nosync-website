@@ -90,6 +90,11 @@
     const date = new Date(`${value}T12:00:00Z`);
     return Number.isFinite(date.getTime()) ? date : null;
   }
+  function formatReleaseDate(value) {
+    const date = validDate(value);
+    if (!date) return '';
+    return `Released ${new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(date)}`;
+  }
   function releaseIdentity(release) {
     const clean = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
     return `${clean(release.title)}|${clean(release.artist)}`;
@@ -107,6 +112,7 @@
       badge: 'OUT NOW',
       visible: release.visible !== false,
       links,
+      releaseDate: words(release.spotifyReleaseDate, words(release.releaseDate)),
       _releaseDate: words(release.spotifyReleaseDate, words(release.releaseDate))
     };
   }
@@ -282,6 +288,8 @@
     const heading = node('h2', '', title);
     heading.id = 'stream-modal-title';
     copy.append(heading, node('p', 'release-artist', words(release.artist)));
+    const releaseDateText = formatReleaseDate(words(release.releaseDate, words(release._releaseDate)));
+    if (releaseDateText) copy.append(node('p', 'stream-modal-release-date', releaseDateText));
     releaseRow.append(art, copy);
     const servicesTitle = node('p', 'stream-modal-services-title', words(settings?.music?.streamModalTitle, 'Choose your platform'));
     const services = node('div', 'stream-service-list');
