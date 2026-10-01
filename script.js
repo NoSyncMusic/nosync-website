@@ -678,10 +678,65 @@
     observer.observe(host);
   }
 
+  function statParts(value) {
+    const text = words(value).trim();
+    const match = text.match(/^(\d+(?:[.,]\d+)?)(.*)$/);
+    if (!match) return null;
+    const number = Number(match[1].replace(',', '.'));
+    if (!Number.isFinite(number)) return null;
+    return { number, suffix: match[2], decimals: (match[1].split(/[.,]/)[1] || '').length };
+  }
+
+  function animateStatValue(element, target) {
+    const parts = statParts(target);
+    if (!parts || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      element.textContent = target;
+      return;
+    }
+
+    const duration = 1050;
+    const startTime = performance.now();
+    element.setAttribute('aria-label', target);
+    element.textContent = `0${parts.suffix}`;
+
+    const frame = (now) => {
+      const progress = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = parts.number * eased;
+      const shown = parts.decimals
+        ? current.toFixed(parts.decimals)
+        : String(Math.round(current));
+      element.textContent = `${shown}${parts.suffix}`;
+      if (progress < 1) requestAnimationFrame(frame);
+      else element.textContent = target;
+    };
+    requestAnimationFrame(frame);
+  }
+
+  function startStatCounters(host) {
+    const values = [...host.querySelectorAll('.credibility-value[data-stat-target]')];
+    if (!values.length) return;
+    const run = () => values.forEach((element) => {
+      if (element.dataset.statAnimated === 'true') return;
+      element.dataset.statAnimated = 'true';
+      animateStatValue(element, element.dataset.statTarget || element.textContent || '');
+    });
+
+    if (!('IntersectionObserver' in window)) {
+      run();
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      run();
+    }, { threshold: 0.35 });
+    observer.observe(host);
+  }
+
   function renderHighlights(content) {
     const host = byId('credibility-strip');
     if (!host) return;
-    delete host.dataset.statsAnimated;
     host.replaceChildren();
 
     const stats = record(content.stats) ? content.stats : {};
@@ -702,7 +757,7 @@
       host.append(block);
     });
     host.hidden = false;
-    requestAnimationFrame(() => startStatsAnimation(host));
+    startStatCounters(host);
   }
 
   function createExploreCard(link) {
