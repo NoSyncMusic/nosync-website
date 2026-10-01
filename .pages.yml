@@ -108,10 +108,16 @@ content:
       label: Tekst luisterknop na release
       type: string
     - name: followNote
-      label: Toelichting Spotify-toestemming
+      label: Toelichting pre-save en follow
       type: text
     - name: countdownLabel
       label: Tekst achter countdown
+      type: string
+    - name: servicesLabel
+      label: Tekst boven streamingdiensten
+      type: string
+    - name: followLabel
+      label: Tekst voor follow-ondersteuning
       type: string
   - name: links
     label: Sectie met sets en playlists
@@ -299,7 +305,7 @@ content:
     label: Aankomende releases
     type: object
     list: true
-    description: Voeg een release één keer toe. Voor release toont de site de pre-save; na herkenning via ISRC schakelt hij automatisch naar Spotify.
+    description: Voeg een release één keer toe. Koppel een smartlink/pre-saveprovider zoals Feature.fm. Die provider kan de DSP-links op releasedag automatisch scannen en follow-acties uitvoeren waar ondersteund.
     fields:
     - name: slug
       label: URL-naam
@@ -327,14 +333,47 @@ content:
     - name: artwork
       label: Artwork
       type: image
-    - name: presaveUrl
-      label: Pre-save URL
+    - name: smartLinkUrl
+      label: Smartlink / pre-saveprovider URL
       type: string
-      description: De URL van je pre-saveprovider. Deze wordt achter de eigen No Sync pre-savepagina gebruikt.
-    - name: followArtist
-      label: Spotify follow vermelden
-      type: boolean
-      description: Zet dit alleen aan als je pre-saveprovider tijdens Spotify-autorisatie ook toestemming vraagt om No Sync te volgen.
+      description: Bijvoorbeeld je Feature.fm pre-save URL. Deze provider regelt de accountautorisatie, pre-save, follow-acties en automatische DSP-matching.
+    - name: providerName
+      label: Providernaam
+      type: string
+      description: Bijvoorbeeld Feature.fm. Alleen voor beheer; wordt niet prominent op de pagina getoond.
+    - name: presaveUrl
+      label: Oude pre-save URL (fallback)
+      type: string
+      description: Alleen als fallback voor bestaande releases. Gebruik bij nieuwe releases Smartlink / pre-saveprovider URL.
+    - name: enabledServices
+      label: Streamingdiensten tonen
+      type: select
+      list: true
+      options:
+        values:
+        - SPOTIFY
+        - APPLE_MUSIC
+        - AMAZON_MUSIC
+        - YOUTUBE_MUSIC
+        - DEEZER
+        - TIDAL
+        - SOUNDCLOUD
+        - AUDIOMACK
+        - ANGHAMMI
+      description: Laat leeg om alle standaard pre-save diensten te tonen.
+    - name: followServices
+      label: Diensten met followactie
+      type: select
+      list: true
+      options:
+        values:
+        - SPOTIFY
+        - AMAZON_MUSIC
+        - YOUTUBE_MUSIC
+        - DEEZER
+        - TIDAL
+        - AUDIOMACK
+      description: Alleen aanvinken als je smartlinkprovider voor die dienst daadwerkelijk een followactie heeft ingesteld.
     - name: featured
       label: Uitlichten op homepage
       type: boolean
@@ -400,6 +439,7 @@ content:
         type: select
         options:
           values:
+          - SMART_LINK
           - SPOTIFY
           - APPLE_MUSIC
           - YOUTUBE_MUSIC
