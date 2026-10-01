@@ -47,9 +47,9 @@ async function openAndCheckModal(page, trigger, label) {
     };
   });
   assert.ok(geometry.panelTop >= geometry.viewportTop - 3,
-    `${label}: modal starts outside visual viewport`);
+    `${label}: modal starts outside visual viewport: ${JSON.stringify(geometry)}`);
   assert.ok(geometry.panelBottom <= geometry.viewportBottom + 3,
-    `${label}: modal ends outside visual viewport`);
+    `${label}: modal ends outside visual viewport: ${JSON.stringify(geometry)}`);
   assert.equal(geometry.bodyPosition, 'fixed', `${label}: background page is not scroll-locked`);
   assert.equal(geometry.modalOpen, true, `${label}: modal state class missing`);
 
@@ -59,6 +59,8 @@ async function openAndCheckModal(page, trigger, label) {
   assert.ok(closeEnough(before, after),
     `${label}: scroll position changed from ${before} to ${after} after closing modal`);
 }
+
+const failures = [];
 
 for (const config of matrix) {
   const browser = await config.type.launch();
@@ -72,22 +74,32 @@ for (const config of matrix) {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.goto(`${base}/index.html`, { waitUntil: 'domcontentloaded' });
-  await page.locator('#featured .stream-here-button').waitFor();
-  await assertNoHorizontalOverflow(page, `${config.name} homepage`);
-  await openAndCheckModal(page, '#featured .stream-here-button', `${config.name} homepage`);
+  try {
+    await page.goto(`${base}/index.html`, { waitUntil: 'domcontentloaded' });
+    await page.locator('#featured .stream-here-button').waitFor();
+    await assertNoHorizontalOverflow(page, `${config.name} homepage`);
+    await openAndCheckModal(page, '#featured .stream-here-button', `${config.name} homepage`);
 
-  await page.goto(`${base}/releases/`, { waitUntil: 'domcontentloaded' });
-  await page.locator('#all-releases .stream-here-button').first().waitFor();
-  await assertNoHorizontalOverflow(page, `${config.name} releases`);
-  await openAndCheckModal(page, '#all-releases .stream-here-button', `${config.name} releases`);
+    await page.goto(`${base}/releases/`, { waitUntil: 'domcontentloaded' });
+    await page.locator('#all-releases .stream-here-button').first().waitFor();
+    await assertNoHorizontalOverflow(page, `${config.name} releases`);
+    await openAndCheckModal(page, '#all-releases .stream-here-button', `${config.name} releases`);
 
-  await page.goto(`${base}/presave/`, { waitUntil: 'domcontentloaded' });
-  await page.locator('#presave-status').waitFor();
-  await assertNoHorizontalOverflow(page, `${config.name} presave`);
+    await page.goto(`${base}/presave/`, { waitUntil: 'domcontentloaded' });
+    await page.locator('#presave-status').waitFor();
+    await assertNoHorizontalOverflow(page, `${config.name} presave`);
 
-  assert.deepEqual(pageErrors, [], `${config.name}: page errors: ${pageErrors.join(' | ')}`);
-  await context.close();
-  await browser.close();
-  console.log(`PASS: ${config.name}`);
+    assert.deepEqual(pageErrors, [], `${config.name}: page errors: ${pageErrors.join(' | ')}`);
+    console.log(`PASS: ${config.name}`);
+  } catch (error) {
+    failures.push(`${config.name}: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`FAIL: ${config.name}`, error);
+  } finally {
+    await context.close();
+    await browser.close();
+  }
+}
+
+if (failures.length) {
+  throw new Error(`Browser smoke failures:\n${failures.join('\n')}`);
 }
