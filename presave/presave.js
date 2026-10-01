@@ -57,11 +57,72 @@
     return Number.isFinite(date.getTime()) ? date : null;
   }
 
-  function daysUntil(value) {
-    const target = validDate(value);
-    const today = validDate(todayInAmsterdam());
-    if (!target || !today) return null;
-    return Math.max(0, Math.ceil((target - today) / 86400000));
+  function amsterdamMidnightMs(value) {
+    const date = validDate(value);
+    if (!date) return null;
+    const [year, month, day] = value.split('-').map(Number);
+    const wanted = Date.UTC(year, month - 1, day, 0, 0, 0);
+    let guess = wanted;
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Amsterdam',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23'
+    });
+    for (let step = 0; step < 3; step += 1) {
+      const parts = formatter.formatToParts(new Date(guess));
+      const get = (type) => Number(parts.find((part) => part.type === type)?.value || 0);
+      const represented = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
+      const delta = wanted - represented;
+      guess += delta;
+      if (Math.abs(delta) < 1000) break;
+    }
+    return guess;
+  }
+
+  function startLiveCountdown(value) {
+    const host = byId('presave-countdown');
+    const target = amsterdamMidnightMs(value);
+    if (!host || target === null) return;
+
+    let timer = null;
+    const unit = (value, label) => {
+      const wrap = document.createElement('span');
+      wrap.className = 'presave-countdown-unit';
+      const number = document.createElement('strong');
+      number.className = 'presave-countdown-value';
+      number.textContent = String(value).padStart(2, '0');
+      const name = document.createElement('span');
+      name.className = 'presave-countdown-label';
+      name.textContent = label;
+      wrap.append(number, name);
+      return wrap;
+    };
+
+    const update = () => {
+      const remaining = Math.max(0, target - Date.now());
+      const totalSeconds = Math.floor(remaining / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      host.replaceChildren(
+        unit(days, days === 1 ? 'DAY' : 'DAYS'),
+        unit(hours, 'HOURS'),
+        unit(minutes, 'MIN'),
+        unit(seconds, 'SEC')
+      );
+      host.setAttribute('aria-label', `${days} days, ${hours} hours, ${minutes} minutes and ${seconds} seconds until release`);
+
+      if (remaining <= 0) {
+        if (timer) window.clearInterval(timer);
+        window.setTimeout(() => location.reload(), 900);
+      }
+    };
+
+    update();
+    if (target > Date.now()) timer = window.setInterval(update, 1000);
   }
 
   async function json(filename) {
@@ -184,8 +245,7 @@
       const date = validDate(release.releaseDate);
       if (date) {
         byId('presave-date').textContent = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date).toUpperCase();
-        const left = daysUntil(release.releaseDate);
-        if (!released && left !== null) byId('presave-countdown').textContent = left === 0 ? 'RELEASE DAY' : `${left} ${left === 1 ? 'DAY' : 'DAYS'} TO GO`;
+        if (!released) startLiveCountdown(release.releaseDate);
       }
 
       const button = byId('presave-action');
