@@ -381,6 +381,7 @@ body.stream-modal-open { overflow: hidden; }
   font-weight: 800;
   line-height: .95;
   letter-spacing: .015em;
+  font-variant-numeric: tabular-nums;
 }
 .credibility-label {
   display: block;
