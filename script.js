@@ -593,8 +593,8 @@
     rows(content.highlights).slice(0, 3).forEach((item) => {
       const block = node('div', 'credibility-item');
       block.append(
-        node('strong', 'credibility-value', words(item.value)),
-        node('span', 'credibility-label', words(item.label))
+        node('span', 'credibility-label', words(item.label)),
+        node('strong', 'credibility-value', words(item.value))
       );
       host.append(block);
     });
