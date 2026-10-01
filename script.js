@@ -666,6 +666,7 @@
   function renderHighlights(content) {
     const host = byId('credibility-strip');
     if (!host) return;
+    delete host.dataset.statsAnimated;
     host.replaceChildren();
 
     const stats = record(content.stats) ? content.stats : {};
