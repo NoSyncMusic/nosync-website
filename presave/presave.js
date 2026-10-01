@@ -70,13 +70,49 @@
     return response.json();
   }
 
-  function applyColors(settings) {
-    const colors = settings?.colors || {};
-    for (const [name, value] of Object.entries(colors)) {
-      if (typeof value === 'string' && /^#?[0-9a-f]{3,6}$/i.test(value.trim())) {
-        document.documentElement.style.setProperty(`--${name}`, value.trim().startsWith('#') ? value.trim() : `#${value.trim()}`);
+  function hex(value) {
+    const match = words(value).trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (!match) return '';
+    const digits = match[1].length === 3 ? [...match[1]].map((x) => x + x).join('') : match[1];
+    return `#${digits.toUpperCase()}`;
+  }
+  function channels(color) { return [1, 3, 5].map((start) => parseInt(color.slice(start, start + 2), 16)); }
+  function luminance(color) {
+    const rgb = channels(color).map((v) => { const s = v / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; });
+    return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+  }
+  function contrast(a, b) { const x = luminance(a); const y = luminance(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function blend(color, target, amount) {
+    return '#' + channels(color).map((value, i) => Math.round(value + (channels(target)[i] - value) * amount).toString(16).padStart(2, '0')).join('');
+  }
+  function readableAccent(color, background, surface) {
+    const score = (candidate) => Math.min(contrast(candidate, background), contrast(candidate, surface));
+    let best = color;
+    for (let step = 0; step <= 40; step++) {
+      for (const target of ['#FFFFFF', '#000000']) {
+        const candidate = blend(color, target, step / 40);
+        if (score(candidate) >= 4.5) return candidate;
+        if (score(candidate) > score(best)) best = candidate;
       }
     }
+    return best;
+  }
+  function applyColors(settings) {
+    const fallback = {
+      accent: '#D94A4A', background: '#101010', text: '#E5E5E5', headings: '#F5F5F5',
+      secondary: '#A3A3A3', buttonText: '#101010', surface: '#191919', borders: '#333333'
+    };
+    const colors = {};
+    for (const [name, defaultValue] of Object.entries(fallback)) {
+      colors[name] = hex(settings?.colors?.[name]) || defaultValue;
+      document.documentElement.style.setProperty(`--${name}`, colors[name]);
+    }
+    document.documentElement.style.setProperty('--accent-ink', readableAccent(colors.accent, colors.background, colors.surface));
+    if (contrast(colors.buttonText, colors.accent) < 4.5) {
+      document.documentElement.style.setProperty('--buttonText',
+        contrast('#000000', colors.accent) >= contrast('#FFFFFF', colors.accent) ? '#000000' : '#FFFFFF');
+    }
+    document.querySelector('meta[name="theme-color"]').content = colors.background;
   }
 
   function requestedSlug() {
