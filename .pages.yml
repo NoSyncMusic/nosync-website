@@ -3,7 +3,7 @@ media:
   output: media
 content:
 - name: appearance
-  label: Homepage & kleuren
+  label: Design, teksten & kleuren
   type: file
   path: settings.json
   format: json
@@ -293,338 +293,72 @@ content:
     description: Rood blijft een accent. Kleine accentteksten en knoptekst worden zo nodig aangepast voor
       leesbaar contrast. Controleer je eigen tekstkleuren na wijzigingen.
 - name: homepage
-  label: Muziek, links & contact
+  label: Content, releases & contact
   type: file
   path: content.json
   format: json
   fields:
-  - name: socials
-    label: Socials
-    type: object
-    list: true
-    fields:
-    - name: type
-      label: Platform
-      type: select
-      options:
-        values:
-        - INSTAGRAM
-        - SPOTIFY
-        - YOUTUBE
-        - TIKTOK
-        - FACEBOOK
-        - SOUNDCLOUD
-        - TWITTER
-    - name: url
-      label: Link
-      type: string
-      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
-    - name: label
-      label: Eigen tekst voor deze link (optioneel)
-      type: string
   - name: stats
     label: Statistieken onder de hero
     type: object
     description: Total streams en countries streaming pas je handmatig aan. Official releases wordt automatisch uit de zichtbare releasecatalogus berekend en per 5 afgerond.
     fields:
-    - name: totalStreams
-      label: Total streams
-      type: string
-      description: Bijvoorbeeld 100K+.
-    - name: totalStreamsLabel
-      label: Label total streams
-      type: string
-    - name: officialReleasesLabel
-      label: Label official releases
-      type: string
-      description: Het cijfer zelf wordt automatisch berekend uit Releases.
-    - name: countriesStreaming
-      label: Countries streaming
-      type: string
-      description: Bijvoorbeeld 50+.
-    - name: countriesStreamingLabel
-      label: Label countries streaming
-      type: string
-  - name: upcomingReleases
-    label: Aankomende releases
+    - name: upcomingReleases
+    label: Aankomende releases & pre-saves
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{title} — {releaseDate}"
     description: Voeg een release één keer toe. Koppel een smartlink/pre-saveprovider zoals Feature.fm. Die provider kan de DSP-links op releasedag automatisch scannen en follow-acties uitvoeren waar ondersteund.
     fields:
-    - name: slug
-      label: URL-naam
-      type: string
-      description: Alleen kleine letters, cijfers en streepjes. Bijvoorbeeld push. De pre-save opent via /presave/push/.
-      pattern:
-        regex: ^[a-z0-9]+(?:-[a-z0-9]+)*$
-        message: Gebruik alleen kleine letters, cijfers en streepjes.
-    - name: title
-      label: Titel
-      type: string
-      required: true
-    - name: artist
-      label: Artiesten
-      type: string
-      required: true
-    - name: isrc
-      label: ISRC
-      type: string
-      description: Bijvoorbeeld NLABC2612345. Streepjes zijn toegestaan; de synchronisatie normaliseert de code.
-    - name: releaseDate
-      label: Releasedatum
-      type: date
-      required: true
-    - name: artwork
-      label: Artwork
-      type: image
-    - name: smartLinkUrl
-      label: Smartlink / pre-saveprovider URL
-      type: string
-      description: Bijvoorbeeld je Feature.fm pre-save URL. Deze provider regelt de accountautorisatie, pre-save, follow-acties en automatische DSP-matching.
-    - name: providerName
-      label: Providernaam
-      type: string
-      description: Bijvoorbeeld Feature.fm. Alleen voor beheer; wordt niet prominent op de pagina getoond.
-    - name: presaveUrl
-      label: Oude pre-save URL (fallback)
-      type: string
-      description: Alleen als fallback voor bestaande releases. Gebruik bij nieuwe releases Smartlink / pre-saveprovider URL.
-    - name: enabledServices
-      label: Streamingdiensten tonen
-      type: select
-      options:
-        multiple: true
-        values:
-        - SPOTIFY
-        - APPLE_MUSIC
-        - AMAZON_MUSIC
-        - YOUTUBE_MUSIC
-        - DEEZER
-        - TIDAL
-        - SOUNDCLOUD
-        - AUDIOMACK
-        - ANGHAMMI
-      description: Laat leeg om alle standaard pre-save diensten te tonen.
-    - name: followServices
-      label: Diensten met followactie
-      type: select
-      options:
-        multiple: true
-        values:
-        - SPOTIFY
-        - AMAZON_MUSIC
-        - YOUTUBE_MUSIC
-        - DEEZER
-        - TIDAL
-        - AUDIOMACK
-      description: Alleen aanvinken als je smartlinkprovider voor die dienst daadwerkelijk een followactie heeft ingesteld.
-    - name: featured
-      label: Uitlichten op homepage
-      type: boolean
-    - name: visible
-      label: Zichtbaar
-      type: boolean
-    - name: status
-      label: Status
-      type: select
-      options:
-        values:
-        - upcoming
-        - released
-      description: Laat op upcoming staan. De ISRC-synchronisatie zet dit automatisch op released zodra de track op Spotify is gevonden.
-    - name: spotifyTrackId
-      label: Automatisch - Spotify Track ID
-      type: string
-    - name: spotifyUrl
-      label: Automatisch - Spotify URL
-      type: string
-    - name: spotifyArtwork
-      label: Automatisch - Spotify artwork
-      type: string
-    - name: spotifyTitle
-      label: Automatisch - Spotify titel
-      type: string
-    - name: spotifyArtist
-      label: Automatisch - Spotify artiesten
-      type: string
-    - name: spotifyReleaseDate
-      label: Automatisch - Spotify releasedatum
-      type: string
+    - name: releases
+    label: Uitgebrachte releases
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{title} — {artist}"
+    fields:
     - name: links
-      label: Luisterlinks na release (optioneel)
-      type: object
-      list: true
-      description: Optioneel. Voeg directe streaminglinks toe; na de releasedatum verschijnen ze automatisch in de Stream Here-popup. De smartlink en Spotify-link blijven als fallback beschikbaar.
-      fields:
-      - name: type
-        label: Platform
-        type: select
-        options:
-          values:
-          - SMART_LINK
-          - SPOTIFY
-          - APPLE_MUSIC
-          - YOUTUBE_MUSIC
-          - DEEZER
-          - BEATPORT
-          - SOUNDCLOUD
-          - AMAZON_MUSIC
-          - AUDIOMACK
-          - ANGHAMMI
-          - TIDAL
-          - OTHER
-      - name: url
-        label: Link
-        type: string
-        description: Gebruik de volledige https://-link.
-      - name: label
-        label: Eigen tekst voor deze link (optioneel)
-        type: string
-        description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
-  - name: releases
-    label: Releases
+    label: Explore: sets, playlists & downloads
     type: object
     list: true
     fields:
-    - name: title
-      label: Titel
-      type: string
-    - name: artist
-      label: Artiesten
-      type: string
-    - name: releaseDate
-      label: Releasedatum (optioneel)
-      type: date
-      description: Nieuwe releases krijgen dit automatisch via de Spotify/ISRC-sync. Voor handmatig toegevoegde releases kun je hem zelf invullen.
-    - name: artwork
-      label: Artwork
-      type: image
-    - name: featured
-      label: Uitgelichte release
-      type: boolean
-    - name: badge
-      label: Label boven titel
-      type: string
-    - name: visible
-      label: Zichtbaar
-      type: boolean
-    - name: links
-      label: Streamingdiensten / luisterlinks
-      type: object
-      list: true
-      description: Deze links kun je altijd handmatig aanvullen of aanpassen. Iedere geldige link verschijnt automatisch in de Stream Here-popup.
-      fields:
-      - name: type
-        label: Platform
-        type: select
-        options:
-          values:
-          - SMART_LINK
-          - SPOTIFY
-          - APPLE_MUSIC
-          - YOUTUBE_MUSIC
-          - DEEZER
-          - BEATPORT
-          - SOUNDCLOUD
-          - AMAZON_MUSIC
-          - AUDIOMACK
-          - ANGHAMMI
-          - TIDAL
-          - OTHER
-      - name: url
-        label: Link
-        type: string
-        description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
-      - name: label
-        label: Eigen tekst voor deze link (optioneel)
-        type: string
-        description: Gebruik dit vooral bij OTHER, bijvoorbeeld Qobuz, Traxsource of Bandcamp.
-  - name: links
-    label: Sets, playlists en overige links
-    type: object
-    list: true
-    fields:
-    - name: title
-      label: Titel
-      type: string
-    - name: subtitle
-      label: Ondertitel
-      type: string
-    - name: url
-      label: Link
-      type: string
-      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
-    - name: image
-      label: Afbeelding
-      type: image
-    - name: category
-      label: Categorie
-      type: select
-      options:
-        values:
-        - DJ_SET
-        - PLAYLIST
-        - FREE_DOWNLOAD
-        - FOR_ARTISTS
-        - MUSIC
-      description: FOR_ARTISTS wordt apart onder 'For artists' geplaatst; de overige categorieën blijven bij de fanlinks.
-    - name: visible
-      label: Zichtbaar
-      type: boolean
-  - name: shows
+    - name: shows
     label: Shows
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{date} — {title}"
     fields:
-    - name: date
-      label: Datum (JJJJ-MM-DD)
-      type: string
-      description: Gebruik JJJJ-MM-DD. Alleen geldige datums vanaf vandaag (Nederlandse tijd) worden getoond.
-    - name: title
-      label: Evenement
-      type: string
-    - name: venue
-      label: Venue
-      type: string
-    - name: location
-      label: Locatie
-      type: string
-    - name: ticketUrl
-      label: Ticketlink (leeg als nog onbekend)
-      type: string
-      description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
-    - name: soldOut
-      label: Uitverkocht
-      type: boolean
-    - name: visible
-      label: Zichtbaar
-      type: boolean
-    description: Gebruikt als reserve als Bandsintown leeg of onbereikbaar is, of wanneer Homepage & kleuren → Showsectie → Shows automatisch laden op
-      manual staat. Bij bandsintown beheer je je optredens in Bandsintown for Artists.
-  - name: bandsintown
+    - name: bandsintown
     label: Bandsintown-link
     type: string
     description: Volledige artiestenlink met ID, bijvoorbeeld https://www.bandsintown.com/a/15598110-no-sync.
       Deze bepaalt welke shows automatisch laden.
-  - name: presskit
+  - name: socials
+    label: Socials
+    type: object
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{type}"
+    fields:
+    - name: presskit
     label: Presskit-link
     type: string
     description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
   - name: contacts
-    label: Contactgegevens
+    label: Contactadressen
     type: object
-    list: true
+    list:
+      collapsible:
+        collapsed: true
+        summary: "{label} — {email}"
     fields:
-    - name: label
-      label: Categorie
-      type: string
-    - name: email
-      label: E-mailadres
-      type: string
-    - name: note
-      label: Toelichting
-      type: text
-
+  
 actions:
 - name: publish-namecheap
   label: Publiceer naar Namecheap
