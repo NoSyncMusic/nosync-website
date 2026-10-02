@@ -357,6 +357,9 @@ content:
         label: ISRC
         type: string
         description: Bijvoorbeeld NLABC2612345. Streepjes zijn toegestaan; de synchronisatie normaliseert de code.
+        pattern:
+          regex: ^[A-Za-z]{2}-?[A-Za-z0-9]{3}-?\\d{2}-?\\d{5}$
+          message: Gebruik een geldige 12-teken ISRC, bijvoorbeeld NLABC2612345.
       - name: releaseDate
         label: Releasedatum
         type: date
@@ -367,6 +370,9 @@ content:
       - name: smartLinkUrl
         label: Smartlink / pre-saveprovider URL
         type: string
+        pattern:
+          regex: ^https://[^\\s]+$
+          message: Gebruik een geldige https://-link.
         description: Bijvoorbeeld je Feature.fm pre-save URL. Deze provider regelt de accountautorisatie, pre-save, follow-acties en automatische DSP-matching.
       - name: providerName
         label: Providernaam
@@ -375,6 +381,9 @@ content:
       - name: presaveUrl
         label: Oude pre-save URL (fallback)
         type: string
+        pattern:
+          regex: ^https://[^\\s]+$
+          message: Gebruik een geldige https://-link.
         description: Alleen als fallback voor bestaande releases. Gebruik bij nieuwe releases Smartlink / pre-saveprovider URL.
       - name: enabledServices
         label: Streamingdiensten tonen
@@ -478,6 +487,9 @@ content:
         - name: url
           label: Link
           type: string
+          pattern:
+            regex: ^https://[^\\s]+$
+            message: Gebruik een geldige https://-link.
           description: Gebruik de volledige https://-link.
         - name: label
           label: Eigen tekst voor deze link (optioneel)
@@ -542,6 +554,9 @@ content:
         - name: url
           label: Link
           type: string
+          pattern:
+            regex: ^https://[^\\s]+$
+            message: Gebruik een geldige https://-link.
           description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
         - name: label
           label: Eigen tekst voor deze link (optioneel)
@@ -564,6 +579,9 @@ content:
       - name: url
         label: Link
         type: string
+        pattern:
+          regex: ^https://[^\\s]+$
+          message: Gebruik een geldige https://-link.
         description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
       - name: image
         label: Afbeelding
@@ -591,9 +609,9 @@ content:
           summary: "{date} — {title}"
       fields:
       - name: date
-        label: Datum (JJJJ-MM-DD)
-        type: string
-        description: Gebruik JJJJ-MM-DD. Alleen geldige datums vanaf vandaag (Nederlandse tijd) worden getoond.
+        label: Datum
+        type: date
+        description: Alleen geldige datums vanaf vandaag (Nederlandse tijd) worden getoond.
       - name: title
         label: Evenement
         type: string
@@ -606,6 +624,9 @@ content:
       - name: ticketUrl
         label: Ticketlink (leeg als nog onbekend)
         type: string
+        pattern:
+          regex: ^https://[^\\s]+$
+          message: Gebruik een geldige https://-link.
         description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
       - name: soldOut
         label: Uitverkocht
@@ -638,6 +659,9 @@ content:
       - name: url
         label: Link
         type: string
+        pattern:
+          regex: ^https://[^\\s]+$
+          message: Gebruik een geldige https://-link.
         description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
       - name: label
         label: Eigen tekst voor deze link (optioneel)
@@ -645,11 +669,17 @@ content:
     - name: bandsintown
       label: Bandsintown-link
       type: string
+      pattern:
+        regex: ^https://(www\\.)?bandsintown\\.com/[^\\s]+$
+        message: Gebruik een geldige Bandsintown https://-link.
       description: Volledige artiestenlink met ID, bijvoorbeeld https://www.bandsintown.com/a/15598110-no-sync.
         Deze bepaalt welke shows automatisch laden.
     - name: presskit
       label: Presskit-link
       type: string
+      pattern:
+        regex: ^https://[^\\s]+$
+        message: Gebruik een geldige https://-link.
       description: Gebruik de volledige https://-link. Links openen in een nieuw tabblad.
     - name: contacts
       label: Contactadressen
@@ -665,6 +695,9 @@ content:
       - name: email
         label: E-mailadres
         type: string
+        pattern:
+          regex: ^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$
+          message: Gebruik een geldig e-mailadres.
       - name: note
         label: Toelichting
         type: text
