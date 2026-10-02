@@ -17,7 +17,7 @@
   let streamModalCloseTimer = null;
   let streamModalScrollY = 0;
   let streamModalBodyStyle = null;
-  let releaseViewAnimation = null;
+  let releaseViewAnimations = [];
 
   function node(tag, className, text) {
     const result = document.createElement(tag);
@@ -439,61 +439,113 @@
     return fragment;
   }
 
+  function createReleaseViewLayer(releases, settings, view) {
+    const layer = node('div', 'release-view-layer');
+    layer.dataset.releaseView = view;
+    layer.append(buildReleaseView(releases, settings, view));
+    return layer;
+  }
+
+  function setReleaseViewControlsDisabled(disabled) {
+    [byId('release-view-grid'), byId('release-view-year')].forEach((button) => {
+      if (button) button.disabled = disabled;
+    });
+  }
+
+  function cancelReleaseViewAnimations() {
+    releaseViewAnimations.forEach((animation) => {
+      try { animation.cancel(); } catch {}
+    });
+    releaseViewAnimations = [];
+  }
+
   function renderReleaseView(host, releases, settings, view, animate = false) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const oldHeight = host.getBoundingClientRect().height;
+    const newLayer = createReleaseViewLayer(releases, settings, view);
+    const oldLayer = host.firstElementChild;
 
-    if (releaseViewAnimation) {
-      releaseViewAnimation.cancel();
-      releaseViewAnimation = null;
-      host.style.height = '';
-      host.style.overflow = '';
-      host.classList.remove('is-view-switching');
-    }
-
-    host.replaceChildren(buildReleaseView(releases, settings, view));
     host.dataset.view = view;
     updateViewControls(view);
 
-    if (!animate || reduceMotion || oldHeight <= 0) return;
+    if (!animate || reduceMotion || !(oldLayer instanceof HTMLElement)) {
+      cancelReleaseViewAnimations();
+      host.replaceChildren(newLayer);
+      host.style.height = '';
+      host.style.overflow = '';
+      host.style.position = '';
+      host.classList.remove('is-view-switching');
+      setReleaseViewControlsDisabled(false);
+      return;
+    }
 
-    const newHeight = host.scrollHeight;
-    if (newHeight <= 0) return;
+    cancelReleaseViewAnimations();
 
+    const oldHeight = Math.max(1, host.getBoundingClientRect().height);
     host.classList.add('is-view-switching');
+    host.style.position = 'relative';
     host.style.height = `${oldHeight}px`;
     host.style.overflow = 'hidden';
 
-    releaseViewAnimation = host.animate([
-      {
-        height: `${oldHeight}px`,
-        opacity: .42,
-        transform: 'translate3d(0, 10px, 0)'
-      },
-      {
-        height: `${newHeight}px`,
-        opacity: 1,
-        transform: 'translate3d(0, 0, 0)'
-      }
-    ], {
-      duration: 380,
-      easing: 'cubic-bezier(.2, .8, .2, 1)',
-      fill: 'both'
+    oldLayer.classList.add('release-view-layer-old');
+    Object.assign(oldLayer.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%'
     });
 
-    releaseViewAnimation.addEventListener('finish', () => {
-      const finishedAnimation = releaseViewAnimation;
-      releaseViewAnimation = null;
-      finishedAnimation?.cancel();
-      host.style.height = '';
-      host.style.overflow = '';
-      host.classList.remove('is-view-switching');
-    }, { once: true });
+    newLayer.classList.add('release-view-layer-new');
+    Object.assign(newLayer.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      visibility: 'hidden'
+    });
+    host.append(newLayer);
 
-    releaseViewAnimation.addEventListener('cancel', () => {
+    const newHeight = Math.max(1, newLayer.getBoundingClientRect().height);
+    newLayer.style.visibility = '';
+    setReleaseViewControlsDisabled(true);
+
+    const heightAnimation = host.animate([
+      { height: `${oldHeight}px` },
+      { height: `${newHeight}px` }
+    ], {
+      duration: 520,
+      easing: 'cubic-bezier(.22, .72, .18, 1)',
+      fill: 'forwards'
+    });
+
+    const oldAnimation = oldLayer.animate([
+      { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+      { opacity: 0, transform: 'translate3d(0, -6px, 0) scale(.996)' }
+    ], {
+      duration: 260,
+      easing: 'cubic-bezier(.4, 0, 1, 1)',
+      fill: 'forwards'
+    });
+
+    const newAnimation = newLayer.animate([
+      { opacity: 0, transform: 'translate3d(0, 8px, 0) scale(.996)' },
+      { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' }
+    ], {
+      duration: 380,
+      delay: 90,
+      easing: 'cubic-bezier(.2, .8, .2, 1)',
+      fill: 'forwards'
+    });
+
+    releaseViewAnimations = [heightAnimation, oldAnimation, newAnimation];
+
+    heightAnimation.addEventListener('finish', () => {
+      cancelReleaseViewAnimations();
+      newLayer.removeAttribute('style');
+      newLayer.classList.remove('release-view-layer-new');
+      host.replaceChildren(newLayer);
       host.style.height = '';
       host.style.overflow = '';
+      host.style.position = '';
       host.classList.remove('is-view-switching');
+      setReleaseViewControlsDisabled(false);
     }, { once: true });
   }
 
