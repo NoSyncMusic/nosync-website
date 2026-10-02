@@ -482,7 +482,9 @@
     });
 
     releaseViewAnimation.addEventListener('finish', () => {
+      const finishedAnimation = releaseViewAnimation;
       releaseViewAnimation = null;
+      finishedAnimation?.cancel();
       host.style.height = '';
       host.style.overflow = '';
       host.classList.remove('is-view-switching');
