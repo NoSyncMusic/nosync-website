@@ -44,6 +44,18 @@ function nestedPage(release, slug) {
   const canonical = `https://nosyncmusic.com/presave/${slug}/`;
   const artwork = publicArtwork(release);
   const pageTitle = `${title} — ${artist}`;
+  const recordingSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'MusicRecording',
+    name: title,
+    byArtist: {
+      '@type': 'MusicGroup',
+      name: artist
+    },
+    datePublished: release.spotifyReleaseDate || release.releaseDate || undefined,
+    image: artwork,
+    url: canonical
+  }).replaceAll('<', '\\u003c');
 
   const socialMeta = [
     `  <link rel="canonical" href="${htmlEscape(canonical)}">`,
@@ -57,7 +69,8 @@ function nestedPage(release, slug) {
     '  <meta name="twitter:card" content="summary_large_image">',
     `  <meta name="twitter:title" content="${htmlEscape(pageTitle)}">`,
     `  <meta name="twitter:description" content="${htmlEscape(description)}">`,
-    `  <meta name="twitter:image" content="${htmlEscape(artwork)}">`
+    `  <meta name="twitter:image" content="${htmlEscape(artwork)}">`,
+    `  <script type="application/ld+json">${recordingSchema}</script>`
   ].join('\n');
 
   return template
