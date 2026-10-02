@@ -115,7 +115,7 @@
   function validDate(value) {
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
     const date = new Date(`${value}T12:00:00Z`);
-    return Number.isFinite(date.getTime()) ? date : null;
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null;
   }
 
   function formatReleaseDate(value) {
@@ -176,13 +176,17 @@
     ).join('').toUpperCase();
   }
 
-  function readableAccent(accent, background) {
-    let candidate = accent;
-    const light = '#FFFFFF';
-    for (let step = 0; step <= 10 && contrast(candidate, background) < 4.5; step += 1) {
-      candidate = blend(accent, light, Math.min(1, (step + 1) / 10));
+  function readableAccent(color, background, surface = background) {
+    const score = (candidate) => Math.min(contrast(candidate, background), contrast(candidate, surface));
+    let best = color;
+    for (let step = 0; step <= 40; step += 1) {
+      for (const target of ['#FFFFFF', '#000000']) {
+        const candidate = blend(color, target, step / 40);
+        if (score(candidate) >= 4.5) return candidate;
+        if (score(candidate) > score(best)) best = candidate;
+      }
     }
-    return candidate;
+    return best;
   }
 
   window.NoSyncCore = Object.freeze({
