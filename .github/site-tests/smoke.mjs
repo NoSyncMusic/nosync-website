@@ -7,6 +7,8 @@ const matrix = [
   { name: 'Chromium desktop', type: chromium, viewport: { width: 1280, height: 800 } },
   { name: 'Firefox desktop', type: firefox, viewport: { width: 1280, height: 800 } },
   { name: 'WebKit desktop', type: webkit, viewport: { width: 1280, height: 800 } },
+  { name: 'Chromium tablet 768', type: chromium, viewport: { width: 768, height: 1024 }, isMobile: true, hasTouch: true },
+  { name: 'Firefox compact 360', type: firefox, viewport: { width: 360, height: 800 } },
   { name: 'Chromium touch 360', type: chromium, viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true },
   { name: 'WebKit iPhone portrait', type: webkit, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
   { name: 'WebKit iPhone compact', type: webkit, viewport: { width: 320, height: 568 }, isMobile: true, hasTouch: true },
@@ -15,6 +17,49 @@ const matrix = [
 
 function closeEnough(a, b, tolerance = 3) {
   return Math.abs(a - b) <= tolerance;
+}
+
+async function assertHealthyDocument(page, label) {
+  const broken = await page.evaluate(async () => {
+    const urls = new Set();
+    const add = (value) => {
+      if (!value) return;
+      try {
+        const url = new URL(value, location.href);
+        if (url.origin !== location.origin) return;
+        if (!['http:', 'https:'].includes(url.protocol)) return;
+        url.hash = '';
+        urls.add(url.href);
+      } catch {}
+    };
+
+    document.querySelectorAll('a[href]').forEach((element) => add(element.getAttribute('href')));
+    document.querySelectorAll('img[src],script[src],link[href]').forEach((element) =>
+      add(element.getAttribute('src') || element.getAttribute('href')));
+
+    const failures = [];
+    for (const url of urls) {
+      try {
+        const response = await fetch(url, { cache: 'no-store', redirect: 'follow' });
+        if (!response.ok) failures.push({ url, status: response.status });
+      } catch (error) {
+        failures.push({ url, error: String(error) });
+      }
+    }
+    return failures;
+  });
+
+  assert.deepEqual(broken, [], `${label}: broken same-origin links/assets detected: ${JSON.stringify(broken)}`);
+
+  const blankTargetIssues = await page.locator('a[target="_blank"]').evaluateAll((elements) =>
+    elements
+      .filter((element) => {
+        const rel = (element.getAttribute('rel') || '').toLowerCase().split(/\s+/);
+        return !rel.includes('noopener');
+      })
+      .map((element) => element.getAttribute('href'))
+  );
+  assert.deepEqual(blankTargetIssues, [], `${label}: target="_blank" links missing rel="noopener"`);
 }
 
 async function assertNoHorizontalOverflow(page, label) {
@@ -114,13 +159,32 @@ for (const config of matrix) {
   });
   const page = await context.newPage();
   const pageErrors = [];
+  const consoleErrors = [];
+  const failedRequests = [];
+  const badResponses = [];
   page.on('pageerror', error => pageErrors.push(error.message));
+  page.on('console', message => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  page.on('requestfailed', request => {
+    const url = request.url();
+    if (url.startsWith(base)) {
+      failedRequests.push(`${request.method()} ${url}: ${request.failure()?.errorText || 'failed'}`);
+    }
+  });
+  page.on('response', response => {
+    const url = response.url();
+    if (url.startsWith(base) && response.status() >= 400) {
+      badResponses.push(`${response.status()} ${url}`);
+    }
+  });
 
   try {
     await page.goto(`${base}/index.html`, { waitUntil: 'domcontentloaded' });
     await page.locator('#featured .stream-here-button').waitFor();
     await waitForPageCurtain(page, `${config.name} homepage`);
     await assertNoHorizontalOverflow(page, `${config.name} homepage`);
+    await assertHealthyDocument(page, `${config.name} homepage`);
     if (config.name === 'Chromium desktop') {
       await assertAccessible(page, 'Homepage');
       const stats = page.locator('#credibility-strip');
@@ -166,6 +230,7 @@ for (const config of matrix) {
       await waitForPageCurtain(page, `${config.name} releases`);
     }
     await assertNoHorizontalOverflow(page, `${config.name} releases`);
+    await assertHealthyDocument(page, `${config.name} releases`);
     if (config.name === 'Chromium desktop') await assertAccessible(page, 'All Releases');
     assert.equal(await page.locator('#release-view-grid').getAttribute('aria-pressed'), 'true',
       `${config.name}: grid is not the default release view`);
@@ -217,16 +282,26 @@ for (const config of matrix) {
     await page.locator('#presave-status').waitFor();
     await waitForPageCurtain(page, `${config.name} presave`);
     await assertNoHorizontalOverflow(page, `${config.name} presave`);
+    await assertHealthyDocument(page, `${config.name} presave`);
     if (config.name === 'Chromium desktop') await assertAccessible(page, 'Pre-save');
 
     if (config.name === 'Chromium desktop') {
       await page.goto(`${base}/under-construction/`, { waitUntil: 'domcontentloaded' });
       await waitForPageCurtain(page, 'Under Construction direct entry');
+      await assertHealthyDocument(page, 'Under Construction');
       await page.goto(`${base}/presave-demo.html`, { waitUntil: 'domcontentloaded' });
       await waitForPageCurtain(page, 'Demo subpage direct entry');
+      await assertHealthyDocument(page, 'Pre-save demo');
+      await page.goto(`${base}/404.html`, { waitUntil: 'domcontentloaded' });
+      await waitForPageCurtain(page, '404 direct entry');
+      await assertNoHorizontalOverflow(page, '404');
+      await assertHealthyDocument(page, '404');
     }
 
     assert.deepEqual(pageErrors, [], `${config.name}: page errors: ${pageErrors.join(' | ')}`);
+    assert.deepEqual(consoleErrors, [], `${config.name}: console errors: ${consoleErrors.join(' | ')}`);
+    assert.deepEqual(failedRequests, [], `${config.name}: failed same-origin requests: ${failedRequests.join(' | ')}`);
+    assert.deepEqual(badResponses, [], `${config.name}: HTTP errors: ${badResponses.join(' | ')}`);
     console.log(`PASS: ${config.name}`);
   } catch (error) {
     failures.push(`${config.name}: ${error instanceof Error ? error.message : String(error)}`);
