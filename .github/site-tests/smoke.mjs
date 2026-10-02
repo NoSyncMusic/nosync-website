@@ -25,6 +25,19 @@ async function assertNoHorizontalOverflow(page, label) {
     `${label}: horizontal overflow ${sizes.scrollWidth}px > ${sizes.clientWidth}px`);
 }
 
+async function waitForPageCurtain(page, label) {
+  await page.locator('body.page-transition-page').waitFor();
+  await page.waitForFunction(() => document.body.classList.contains('is-page-transition-ready'));
+  const state = await page.locator('body').evaluate((element) => ({
+    ready: element.classList.contains('is-page-transition-ready'),
+    wiping: element.classList.contains('is-page-wiping'),
+    pointerEvents: getComputedStyle(element, '::before').pointerEvents
+  }));
+  assert.equal(state.ready, true, `${label}: curtain did not finish revealing`);
+  assert.equal(state.wiping, false, `${label}: page remained in outgoing transition state`);
+  assert.equal(state.pointerEvents, 'none', `${label}: curtain still blocks page interaction`);
+}
+
 async function openAndCheckModal(page, trigger, label) {
   await page.locator(trigger).first().scrollIntoViewIfNeeded();
   const before = await page.evaluate(() => window.scrollY);
@@ -88,7 +101,7 @@ for (const config of matrix) {
   try {
     await page.goto(`${base}/index.html`, { waitUntil: 'domcontentloaded' });
     await page.locator('#featured .stream-here-button').waitFor();
-    await page.waitForTimeout(950);
+    await waitForPageCurtain(page, `${config.name} homepage`);
     await assertNoHorizontalOverflow(page, `${config.name} homepage`);
     if (config.name === 'Chromium desktop') {
       const stats = page.locator('#credibility-strip');
@@ -102,9 +115,28 @@ for (const config of matrix) {
         `Homepage statistics did not finish at their targets: ${JSON.stringify(statValues)}`);
     }
     await openAndCheckModal(page, '#featured .stream-here-button', `${config.name} homepage`);
+    assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('is-page-wiping')), false,
+      `${config.name}: opening a layover incorrectly triggered a page curtain`);
 
-    await page.goto(`${base}/releases/`, { waitUntil: 'domcontentloaded' });
-    await page.locator('#all-releases .stream-here-button').first().waitFor();
+    if (config.name === 'Chromium desktop') {
+      await page.locator('#listen-button').click();
+      await page.waitForTimeout(80);
+      assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('is-page-wiping')), false,
+        'Same-page anchor incorrectly triggered a page curtain');
+
+      await page.locator('#all-releases-link').click();
+      await page.waitForFunction(() => document.body.classList.contains('is-page-wiping'));
+      await page.waitForTimeout(350);
+      assert.notEqual(new URL(page.url()).pathname, '/releases/',
+        'All Releases navigation happened before the curtain fully covered Home');
+      await page.waitForURL((url) => url.pathname === '/releases/');
+      await page.locator('#all-releases .stream-here-button').first().waitFor();
+      await waitForPageCurtain(page, 'Home → All Releases');
+    } else {
+      await page.goto(`${base}/releases/`, { waitUntil: 'domcontentloaded' });
+      await page.locator('#all-releases .stream-here-button').first().waitFor();
+      await waitForPageCurtain(page, `${config.name} releases`);
+    }
     await assertNoHorizontalOverflow(page, `${config.name} releases`);
     assert.equal(await page.locator('#release-view-grid').getAttribute('aria-pressed'), 'true',
       `${config.name}: grid is not the default release view`);
@@ -118,6 +150,7 @@ for (const config of matrix) {
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.locator('#all-releases .stream-here-button').first().waitFor();
+    await waitForPageCurtain(page, `${config.name} releases reload`);
     assert.equal(await page.locator('#release-view-grid').getAttribute('aria-pressed'), 'true',
       `${config.name}: saved grid preference was not restored`);
 
@@ -148,18 +181,20 @@ for (const config of matrix) {
       await page.waitForURL((url) => url.pathname === '/');
       assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('home-page')), true,
         'Homepage did not load after wipe');
-
-      await page.waitForTimeout(1000);
-      const curtain = await page.locator('body').evaluate((element) => {
-        const style = getComputedStyle(element, '::before');
-        return { transform: style.transform, pointerEvents: style.pointerEvents };
-      });
-      assert.notEqual(curtain.transform, 'none', 'Homepage curtain did not render');
+      await waitForPageCurtain(page, 'All Releases → Home');
     }
 
     await page.goto(`${base}/presave/`, { waitUntil: 'domcontentloaded' });
     await page.locator('#presave-status').waitFor();
+    await waitForPageCurtain(page, `${config.name} presave`);
     await assertNoHorizontalOverflow(page, `${config.name} presave`);
+
+    if (config.name === 'Chromium desktop') {
+      await page.goto(`${base}/under-construction/`, { waitUntil: 'domcontentloaded' });
+      await waitForPageCurtain(page, 'Under Construction direct entry');
+      await page.goto(`${base}/presave-demo.html`, { waitUntil: 'domcontentloaded' });
+      await waitForPageCurtain(page, 'Demo subpage direct entry');
+    }
 
     assert.deepEqual(pageErrors, [], `${config.name}: page errors: ${pageErrors.join(' | ')}`);
     console.log(`PASS: ${config.name}`);
