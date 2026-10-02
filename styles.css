@@ -637,3 +637,31 @@ body.stream-modal-open { overflow: hidden; }
     transition: none;
   }
 }
+
+
+/* Smooth homepage entrance */
+@keyframes home-page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+.home-page .site-header,
+.home-page #main-content,
+.home-page .site-footer {
+  animation: home-page-enter .46s cubic-bezier(.2, .8, .2, 1) both;
+}
+.home-page #main-content { animation-delay: .04s; }
+.home-page .site-footer { animation-delay: .08s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page .site-header,
+  .home-page #main-content,
+  .home-page .site-footer {
+    animation: none;
+  }
+}
