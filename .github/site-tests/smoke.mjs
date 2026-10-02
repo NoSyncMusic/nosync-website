@@ -125,6 +125,11 @@ for (const config of matrix) {
       `${config.name}: year view did not activate`);
     assert.ok(await page.locator('.release-year-group').count() > 0,
       `${config.name}: year groups missing in year view`);
+    assert.equal(await page.locator('#all-releases').evaluate((element) => element.classList.contains('is-view-switching')), true,
+      `${config.name}: release view transition did not start`);
+    await page.waitForFunction(() => !document.querySelector('#all-releases')?.classList.contains('is-view-switching'));
+    assert.equal(await page.locator('#all-releases').evaluate((element) => element.style.height), '',
+      `${config.name}: release view transition left a fixed height behind`);
     await assertNoHorizontalOverflow(page, `${config.name} releases year`);
     await openAndCheckModal(page, '#all-releases .stream-here-button', `${config.name} releases`);
 
