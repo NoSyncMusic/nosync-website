@@ -94,3 +94,25 @@ for (const entry of await fs.readdir(path.join(root, 'presave'), { withFileTypes
     }
   } catch {}
 }
+
+
+const sitemapUrls = [
+  'https://nosyncmusic.com/',
+  'https://nosyncmusic.com/releases/',
+  ...[...active].sort().map((slug) => `https://nosyncmusic.com/presave/${slug}/`)
+];
+
+const sitemap = [
+  '<?xml version="1.0" encoding="UTF-8"?>',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ...sitemapUrls.flatMap((url) => [
+    '  <url>',
+    `    <loc>${url}</loc>`,
+    '  </url>'
+  ]),
+  '</urlset>',
+  ''
+].join('\n');
+
+await fs.writeFile(path.join(root, 'sitemap.xml'), sitemap);
+console.log('Sitemap updated.');
