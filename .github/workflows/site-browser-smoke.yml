@@ -60,7 +60,15 @@ jobs:
           if (!names.has('appearance') || !names.has('homepage')) {
             throw new Error('Pages CMS config is missing the appearance or homepage editor.');
           }
-          console.log('Pages CMS configuration is valid YAML and contains the expected editors.');
+
+          const workflowDir = '.github/workflows';
+          const workflowFiles = fs.readdirSync(workflowDir)
+            .filter((name) => name.endsWith('.yml') || name.endsWith('.yaml'));
+          for (const file of workflowFiles) {
+            YAML.parse(fs.readFileSync(`${workflowDir}/${file}`, 'utf8'));
+          }
+
+          console.log(`Configuration valid: Pages CMS + ${workflowFiles.length} GitHub workflows.`);
           NODE
 
       - name: Enforce frontend asset budgets
