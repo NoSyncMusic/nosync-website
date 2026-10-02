@@ -14,14 +14,17 @@
 
   function markReady() {
     window.clearTimeout(revealTimer);
+    const wasReady = body.classList.contains('is-page-transition-ready');
     body.classList.add('is-page-transition-ready');
+    if (!wasReady) window.dispatchEvent(new CustomEvent('nosync:page-transition-ready'));
   }
 
   function resetCurtain() {
     navigating = false;
     window.clearTimeout(revealTimer);
-    body.classList.add('is-page-wipe-reset', 'is-page-transition-ready');
+    body.classList.add('is-page-wipe-reset');
     body.classList.remove('is-page-wiping');
+    markReady();
     requestAnimationFrame(() => requestAnimationFrame(() => {
       body.classList.remove('is-page-wipe-reset');
     }));
