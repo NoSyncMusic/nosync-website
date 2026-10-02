@@ -8,7 +8,8 @@ De broncode van de officiële No Sync-website.
 - **GitHub Pages** is de testomgeving.
 - **Pages CMS** gebruik je voor dagelijkse contentwijzigingen.
 - **Namecheap Stellar Plus** is de productiehosting.
-- Publiceren naar productie gebeurt alleen via **Pages CMS → Publiceer naar Namecheap**.
+- Normaal publiceren naar productie gebeurt via **Pages CMS → Publiceer naar Namecheap**.
+- Als Pages CMS niet beschikbaar is, kan dezelfde beveiligde workflow handmatig in GitHub Actions met een exact commit-SHA worden gestart.
 
 Preview: https://nosyncmusic.github.io/nosync-website/  
 Productie: https://nosyncmusic.com/
@@ -57,7 +58,7 @@ Official releases wordt automatisch per vijf afgerond:
 - 10–14 → `10+`;
 - enzovoort.
 
-De cijfers animeren één keer wanneer de statistieken in beeld komen. Bij `prefers-reduced-motion` wordt niet geanimeerd.
+De cijfers starten pas nadat de page-curtain volledig klaar is, tellen rustig op en animeren één keer wanneer de statistieken in beeld komen. Bij `prefers-reduced-motion` wordt niet geanimeerd.
 
 ## Releases
 
@@ -124,7 +125,9 @@ De generator:
 - maakt statische releasepagina's;
 - verwijdert pagina's wanneer de bijbehorende upcoming release wordt verwijderd;
 - genereert release-specifieke social metadata;
-- commit nieuwe en gewijzigde pagina's automatisch.
+- bouwt automatisch de sitemap met actieve pre-save/releasepagina's;
+- ververst de ingebedde homepage-snapshot uit `settings.json` en `content.json`;
+- commit nieuwe en gewijzigde gegenereerde bestanden automatisch.
 
 ## Shows
 
@@ -150,16 +153,25 @@ Automatische checks omvatten:
 - Grid / By year-weergave;
 - opgeslagen releaseweergave;
 - homepage-statistieken;
+- page-curtain navigatie;
+- ernstige/critieke WCAG accessibility-regressies;
 - JavaScriptfouten;
 - geldige `.pages.yml`-YAML.
 
 ## Publiceren naar Namecheap
 
-Gebruik uitsluitend:
+Normaal gebruik je:
 
 **Pages CMS → Publiceer naar Namecheap**
 
-De productie-workflow accepteert alleen een Pages CMS-payload, valideert de repository en publiceert exact de gekozen commit.
+De productie-workflow publiceert exact de gekozen commit en controleert vóór upload automatisch dat:
+- de commit onderdeel is van `main`;
+- de GitHub Pages-build voor die commit groen is;
+- de volledige browser-smoketest voor die commit groen is.
+
+Als Pages CMS tijdelijk niet beschikbaar is, open je **Actions → Publish to Namecheap → Run workflow** en vul je bij `commit_sha` een volledig, reeds getest commit-SHA in. Laat `payload` dan leeg.
+
+Na upload controleert de workflow productie opnieuw en vergelijkt kritieke bestanden met de lokaal geteste commit. Een eerder getest commit-SHA kan op dezelfde manier als rollback worden gepubliceerd.
 
 Workflow: `.github/workflows/deploy-namecheap.yml`
 
@@ -183,3 +195,15 @@ De volgende beheerbestanden worden niet naar productie geüpload:
 2. Wacht tot **Site browser smoke tests** groen zijn.
 3. Controleer homepage, All releases en eventuele pre-savepagina.
 4. Publiceer daarna via Pages CMS naar Namecheap.
+
+
+## Gedeelde front-end core
+
+`site-core.js` bevat gedeelde, browser-side utilities voor onder andere:
+
+- veilige interne/externe URLs;
+- release-artwork en streaminglinks;
+- datumvalidatie en formattering;
+- kleurcontrast en leesbare accentkleuren.
+
+Home, All Releases en Pre-save gebruiken dezelfde core zodat deze logica niet op meerdere plekken uit elkaar kan groeien.
