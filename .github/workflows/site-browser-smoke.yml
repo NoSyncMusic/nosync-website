@@ -63,6 +63,27 @@ jobs:
           console.log('Pages CMS configuration is valid YAML and contains the expected editors.');
           NODE
 
+      - name: Enforce frontend asset budgets
+        run: |
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const budgets = {
+            'styles.css': 100_000,
+            'script.js': 100_000,
+            'site-core.js': 30_000,
+            'page-transitions.js': 20_000,
+            'releases/releases.js': 80_000,
+            'presave/presave.js': 50_000
+          };
+          for (const [file, limit] of Object.entries(budgets)) {
+            const bytes = fs.statSync(file).size;
+            if (bytes > limit) {
+              throw new Error(`${file} exceeds its budget: ${bytes} > ${limit} bytes`);
+            }
+            console.log(`${file}: ${bytes}/${limit} bytes`);
+          }
+          NODE
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
