@@ -2,6 +2,7 @@
   'use strict';
 
   const byId = (id) => document.getElementById(id);
+  const PAGE_WIPE_MS = 480;
   const words = (value, fallback = '') => typeof value === 'string' ? value : fallback;
   const serviceNames = {
     SPOTIFY: 'Spotify',
@@ -207,7 +208,29 @@
     byId('presave-services-wrap').hidden = !services.length;
   }
 
+  function setupHomeWipeNavigation() {
+    document.querySelectorAll('#presave-back').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (link.target === '_blank' || link.hasAttribute('download')) return;
+
+        const destination = link.href;
+        if (!destination) return;
+
+        event.preventDefault();
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          window.location.assign(destination);
+          return;
+        }
+
+        document.body.classList.add('is-page-wiping');
+        window.setTimeout(() => window.location.assign(destination), PAGE_WIPE_MS);
+      });
+    });
+  }
+
   async function init() {
+    setupHomeWipeNavigation();
     try {
       const [content, settings] = await Promise.all([json('content.json'), json('settings.json')]);
       applyColors(settings);
