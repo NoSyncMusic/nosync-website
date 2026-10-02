@@ -69,6 +69,7 @@ function nestedPage(release, slug) {
     .replaceAll('href="../styles.css', 'href="../../styles.css')
     .replaceAll('src="presave.js', 'src="../presave.js')
     .replaceAll('src="../page-transitions.js', 'src="../../page-transitions.js')
+    .replaceAll('src="../site-core.js', 'src="../../site-core.js')
     .replace('id="presave-back" href="../"', 'id="presave-back" href="../../"');
 }
 
