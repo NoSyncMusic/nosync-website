@@ -17,6 +17,7 @@
   let streamModalCloseTimer = null;
   let streamModalScrollY = 0;
   let streamModalBodyStyle = null;
+  let releaseViewAnimation = null;
 
   function node(tag, className, text) {
     const result = document.createElement(tag);
@@ -404,16 +405,14 @@
     year.setAttribute('aria-pressed', String(!gridActive));
   }
 
-  function renderReleaseView(host, releases, settings, view) {
-    host.replaceChildren();
-    host.dataset.view = view;
+  function buildReleaseView(releases, settings, view) {
+    const fragment = document.createDocumentFragment();
 
     if (view === 'grid') {
       const grid = node('div', 'release-grid all-releases-grid release-grid-flat');
       releases.forEach((release) => grid.append(releaseCard(release, settings)));
-      host.append(grid);
-      updateViewControls(view);
-      return;
+      fragment.append(grid);
+      return fragment;
     }
 
     const groups = new Map();
@@ -423,6 +422,7 @@
       if (!groups.has(year)) groups.set(year, []);
       groups.get(year).push(release);
     });
+
     groups.forEach((items, year) => {
       const section = node('section', 'release-year-group');
       const head = node('div', 'release-year-head');
@@ -433,9 +433,66 @@
       const grid = node('div', 'release-grid all-releases-grid');
       items.forEach((release) => grid.append(releaseCard(release, settings)));
       section.append(head, grid);
-      host.append(section);
+      fragment.append(section);
     });
+
+    return fragment;
+  }
+
+  function renderReleaseView(host, releases, settings, view, animate = false) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const oldHeight = host.getBoundingClientRect().height;
+
+    if (releaseViewAnimation) {
+      releaseViewAnimation.cancel();
+      releaseViewAnimation = null;
+      host.style.height = '';
+      host.style.overflow = '';
+      host.classList.remove('is-view-switching');
+    }
+
+    host.replaceChildren(buildReleaseView(releases, settings, view));
+    host.dataset.view = view;
     updateViewControls(view);
+
+    if (!animate || reduceMotion || oldHeight <= 0) return;
+
+    const newHeight = host.scrollHeight;
+    if (newHeight <= 0) return;
+
+    host.classList.add('is-view-switching');
+    host.style.height = `${oldHeight}px`;
+    host.style.overflow = 'hidden';
+
+    releaseViewAnimation = host.animate([
+      {
+        height: `${oldHeight}px`,
+        opacity: .42,
+        transform: 'translate3d(0, 10px, 0)'
+      },
+      {
+        height: `${newHeight}px`,
+        opacity: 1,
+        transform: 'translate3d(0, 0, 0)'
+      }
+    ], {
+      duration: 380,
+      easing: 'cubic-bezier(.2, .8, .2, 1)',
+      fill: 'both'
+    });
+
+    releaseViewAnimation.addEventListener('finish', () => {
+      releaseViewAnimation = null;
+      host.style.height = '';
+      host.style.overflow = '';
+      host.classList.remove('is-view-switching');
+    }, { once: true });
+
+    releaseViewAnimation.addEventListener('cancel', () => {
+      host.style.height = '';
+      host.style.overflow = '';
+      host.classList.remove('is-view-switching');
+    }, { once: true });
   }
 
   async function init() {
@@ -448,9 +505,10 @@
       let view = storedReleaseView();
 
       const setView = (nextView) => {
+        if (nextView === view) return;
         view = nextView;
         saveReleaseView(view);
-        renderReleaseView(host, releases, settings, view);
+        renderReleaseView(host, releases, settings, view, true);
       };
 
       byId('release-view-grid')?.addEventListener('click', () => setView('grid'));
