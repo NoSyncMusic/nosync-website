@@ -18,6 +18,7 @@ on:
       - "releases/**"
       - "presave/**"
       - ".github/site-tests/**"
+      - "package.json"
       - ".pages.yml"
       - ".github/workflows/site-browser-smoke.yml"
 
@@ -42,7 +43,7 @@ jobs:
           node-version: "20"
 
       - name: Install test dependencies
-        run: npm install --no-save playwright@1.55.0 yaml@2.8.1
+        run: npm install --no-audit --no-fund
 
       - name: Validate Pages CMS configuration
         run: |
