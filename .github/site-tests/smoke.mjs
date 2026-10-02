@@ -25,7 +25,7 @@ async function assertHealthyDocument(page, label) {
     const add = (value) => {
       if (!value) return;
       try {
-        const url = new URL(value, location.href);
+        const url = new URL(value, document.baseURI);
         if (url.origin !== location.origin) return;
         if (!['http:', 'https:'].includes(url.protocol)) return;
         url.hash = '';
