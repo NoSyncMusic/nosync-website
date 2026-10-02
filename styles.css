@@ -514,6 +514,7 @@ body.stream-modal-open { overflow: hidden; }
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color .22s ease, color .22s ease, transform .22s ease;
 }
 .release-view-button:hover { color: var(--headings); }
 .release-view-button.is-active {
@@ -525,6 +526,8 @@ body.stream-modal-open { overflow: hidden; }
   outline-offset: 3px;
 }
 .release-grid-flat { margin-top: 0; }
+.all-releases-list { transform-origin: top center; }
+.all-releases-list.is-view-switching { will-change: height, opacity, transform; }
 
 .release-year-group + .release-year-group { margin-top: 48px; }
 .release-year-head {
