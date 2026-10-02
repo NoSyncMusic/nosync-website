@@ -1,0 +1,16 @@
+{
+  "name": "nosync-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:browser",
+    "test:browser": "node .github/site-tests/smoke.mjs",
+    "generate:presave": "node scripts/generate-presave-pages.mjs",
+    "sync:spotify": "node scripts/sync-spotify.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "playwright": "1.55.0",
+    "yaml": "2.8.1"
+  }
+}
