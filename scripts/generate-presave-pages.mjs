@@ -68,6 +68,7 @@ function nestedPage(release, slug) {
     .replaceAll('href="../apple-touch-icon.png', 'href="../../apple-touch-icon.png')
     .replaceAll('href="../styles.css', 'href="../../styles.css')
     .replaceAll('src="presave.js', 'src="../presave.js')
+    .replaceAll('src="../page-transitions.js', 'src="../../page-transitions.js')
     .replace('id="presave-back" href="../"', 'id="presave-back" href="../../"');
 }
 
