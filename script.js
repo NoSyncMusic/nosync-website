@@ -655,51 +655,114 @@
     return { number, suffix: match[2], decimals: (match[1].split(/[.,]/)[1] || '').length };
   }
 
-  function animateStatValue(element, target) {
+  function statDisplayValue(parts, number) {
+    const shown = parts.decimals
+      ? number.toFixed(parts.decimals)
+      : String(Math.round(number));
+    return `${shown}${parts.suffix}`;
+  }
+
+  function animateStatValue(element, target, delay = 0) {
     const parts = statParts(target);
-    if (!parts || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!parts || reduceMotion) {
       element.textContent = target;
       return;
     }
 
-    const duration = 1050;
-    const startTime = performance.now();
+    const duration = 2200;
     element.setAttribute('aria-label', target);
-    element.textContent = `0${parts.suffix}`;
+    element.textContent = statDisplayValue(parts, 0);
 
-    const frame = (now) => {
-      const progress = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = parts.number * eased;
-      const shown = parts.decimals
-        ? current.toFixed(parts.decimals)
-        : String(Math.round(current));
-      element.textContent = `${shown}${parts.suffix}`;
-      if (progress < 1) requestAnimationFrame(frame);
-      else element.textContent = target;
+    window.setTimeout(() => {
+      const item = element.closest('.credibility-item');
+      item?.classList.add('is-counting');
+      const startTime = performance.now();
+
+      const frame = (now) => {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const eased = progress * progress * (3 - (2 * progress));
+        element.textContent = statDisplayValue(parts, parts.number * eased);
+
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+          return;
+        }
+
+        element.textContent = target;
+        item?.classList.remove('is-counting');
+        item?.classList.add('is-count-complete');
+        window.setTimeout(() => item?.classList.remove('is-count-complete'), 420);
+      };
+
+      requestAnimationFrame(frame);
+    }, delay);
+  }
+
+  function afterHomepageReveal(callback) {
+    let started = false;
+    let fallbackTimer = 0;
+
+    const run = () => {
+      if (started) return;
+      started = true;
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener('nosync:page-transition-ready', onReady);
+      window.setTimeout(callback, 260);
     };
-    requestAnimationFrame(frame);
+
+    const onReady = () => run();
+
+    if (document.body.classList.contains('is-page-transition-ready')) {
+      run();
+      return;
+    }
+
+    window.addEventListener('nosync:page-transition-ready', onReady, { once: true });
+    fallbackTimer = window.setTimeout(run, 1800);
   }
 
   function startStatCounters(host) {
     const values = [...host.querySelectorAll('.credibility-value[data-stat-target]')];
     if (!values.length) return;
-    const run = () => values.forEach((element) => {
-      if (element.dataset.statAnimated === 'true') return;
-      element.dataset.statAnimated = 'true';
-      animateStatValue(element, element.dataset.statTarget || element.textContent || '');
-    });
 
-    if (!('IntersectionObserver' in window)) {
-      run();
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      values.forEach((element) => {
+        element.textContent = element.dataset.statTarget || element.textContent || '';
+      });
       return;
     }
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      run();
-    }, { threshold: 0.35 });
-    observer.observe(host);
+
+    values.forEach((element) => {
+      const parts = statParts(element.dataset.statTarget || element.textContent || '');
+      if (parts) element.textContent = statDisplayValue(parts, 0);
+    });
+
+    const run = () => values.forEach((element, index) => {
+      if (element.dataset.statAnimated === 'true') return;
+      element.dataset.statAnimated = 'true';
+      animateStatValue(
+        element,
+        element.dataset.statTarget || element.textContent || '',
+        index * 150
+      );
+    });
+
+    const observe = () => {
+      if (!('IntersectionObserver' in window)) {
+        run();
+        return;
+      }
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        run();
+      }, { threshold: 0.45 });
+      observer.observe(host);
+    };
+
+    afterHomepageReveal(observe);
   }
 
   function renderHighlights(content) {
