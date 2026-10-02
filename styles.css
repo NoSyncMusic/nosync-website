@@ -638,46 +638,49 @@ body.stream-modal-open { overflow: hidden; }
   }
 }
 
-/* Continuous full-screen curtain transition */
-body::before {
+/* Shared full-screen curtain transition */
+body.page-transition-page::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 100000;
   background: var(--background, #101010);
-  transform: translate3d(-101%, 0, 0);
-  pointer-events: none;
-  transition: transform .56s cubic-bezier(.77, 0, .175, 1);
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+  animation: page-curtain-reveal .72s .18s cubic-bezier(.77, 0, .175, 1) forwards;
   will-change: transform;
   backface-visibility: hidden;
 }
 
-body.is-page-wiping::before {
+body.page-transition-page.is-page-transition-ready::before {
+  animation: none;
+  transition: none;
+  transform: translate3d(-101%, 0, 0);
+  pointer-events: none;
+}
+
+body.page-transition-page.is-page-transition-ready.is-page-wiping::before {
   transform: translate3d(0, 0, 0);
+  transition: transform .56s cubic-bezier(.77, 0, .175, 1);
   pointer-events: auto;
 }
 
-body.home-page::before {
-  transform: translate3d(0, 0, 0);
-  pointer-events: auto;
-  animation: home-curtain-reveal .72s .18s cubic-bezier(.77, 0, .175, 1) forwards;
-}
-
-body.is-page-wipe-reset::before {
+body.page-transition-page.is-page-wipe-reset::before {
   animation: none !important;
   transition: none !important;
   transform: translate3d(-101%, 0, 0) !important;
   pointer-events: none !important;
 }
 
-@keyframes home-curtain-reveal {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(101%, 0, 0); }
+@keyframes page-curtain-reveal {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(101%, 0, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before,
-  body.home-page::before {
+  body.page-transition-page::before,
+  body.page-transition-page.is-page-transition-ready::before,
+  body.page-transition-page.is-page-transition-ready.is-page-wiping::before {
     animation: none;
     transition: none;
     transform: translate3d(-101%, 0, 0);
