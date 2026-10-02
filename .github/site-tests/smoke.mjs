@@ -88,6 +88,7 @@ for (const config of matrix) {
   try {
     await page.goto(`${base}/index.html`, { waitUntil: 'domcontentloaded' });
     await page.locator('#featured .stream-here-button').waitFor();
+    await page.waitForTimeout(950);
     await assertNoHorizontalOverflow(page, `${config.name} homepage`);
     if (config.name === 'Chromium desktop') {
       const stats = page.locator('#credibility-strip');
