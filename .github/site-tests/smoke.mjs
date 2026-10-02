@@ -134,6 +134,16 @@ for (const config of matrix) {
     await assertNoHorizontalOverflow(page, `${config.name} releases year`);
     await openAndCheckModal(page, '#all-releases .stream-here-button', `${config.name} releases`);
 
+    if (config.name === 'Chromium desktop') {
+      await page.locator('.archive-back').evaluate((element) => element.click());
+      await page.waitForFunction(() => document.body.classList.contains('is-page-wiping'));
+      assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('is-page-wiping')), true,
+        'Homepage navigation wipe did not start');
+      await page.waitForURL((url) => url.pathname === '/');
+      assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('home-page')), true,
+        'Homepage did not load after wipe');
+    }
+
     await page.goto(`${base}/presave/`, { waitUntil: 'domcontentloaded' });
     await page.locator('#presave-status').waitFor();
     await assertNoHorizontalOverflow(page, `${config.name} presave`);
