@@ -11,6 +11,7 @@ on:
       - "presave/index.html"
       - "presave/presave.js"
       - "scripts/generate-presave-pages.mjs"
+      - "scripts/update-home-snapshot.mjs"
 
 permissions:
   contents: write
@@ -31,12 +32,15 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Refresh homepage snapshot
+        run: node scripts/update-home-snapshot.mjs
+
       - name: Generate release pages
         run: node scripts/generate-presave-pages.mjs
 
       - name: Commit generated pages
         run: |
-          git add presave
+          git add index.html presave sitemap.xml
           if git diff --cached --quiet; then
             echo "No generated page changes."
             exit 0
