@@ -10,6 +10,7 @@ on:
       - "script.js"
       - "styles.css"
       - "page-transitions.js"
+      - "site-core.js"
       - "404.html"
       - "under-construction/**"
       - "presave-demo.html"
