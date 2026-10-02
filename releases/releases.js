@@ -489,14 +489,18 @@
     oldLayer.classList.add('release-view-layer-old');
     Object.assign(oldLayer.style, {
       position: 'absolute',
-      inset: '0',
+      top: '0',
+      left: '0',
+      right: '0',
       width: '100%'
     });
 
     newLayer.classList.add('release-view-layer-new');
     Object.assign(newLayer.style, {
       position: 'absolute',
-      inset: '0',
+      top: '0',
+      left: '0',
+      right: '0',
       width: '100%',
       visibility: 'hidden'
     });
