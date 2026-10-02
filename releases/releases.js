@@ -12,8 +12,6 @@
   };
   const order = ['SMART_LINK', 'SPOTIFY', 'APPLE_MUSIC', 'AMAZON_MUSIC', 'YOUTUBE_MUSIC', 'DEEZER', 'TIDAL', 'SOUNDCLOUD', 'AUDIOMACK', 'ANGHAMMI', 'BEATPORT', 'OTHER'];
   const STREAM_MODAL_ANIMATION_MS = 260;
-  const PAGE_WIPE_CLOSE_MS = 560;
-  const PAGE_WIPE_HOLD_MS = 150;
   const RELEASE_VIEW_STORAGE_KEY = 'nosync-release-view-v2';
   let streamModalReturnFocus = null;
   let streamModalCloseTimer = null;
@@ -538,47 +536,8 @@
     }).catch(() => {});
   }
 
-  function resetPageWipe() {
-    document.body.classList.add('is-page-wipe-reset');
-    document.body.classList.remove('is-page-wiping');
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      document.body.classList.remove('is-page-wipe-reset');
-    }));
-  }
-
-  function setupHomeWipeNavigation() {
-    window.addEventListener('pageshow', (event) => {
-      if (event.persisted || document.body.classList.contains('is-page-wiping')) resetPageWipe();
-    });
-
-    document.querySelectorAll('.brand, .archive-back').forEach((link) => {
-      link.addEventListener('click', (event) => {
-        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        if (link.target === '_blank' || link.hasAttribute('download')) return;
-        if (document.body.classList.contains('is-page-wiping')) {
-          event.preventDefault();
-          return;
-        }
-
-        const destination = link.href;
-        if (!destination) return;
-
-        event.preventDefault();
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          window.location.assign(destination);
-          return;
-        }
-
-        document.body.classList.add('is-page-wiping');
-        window.setTimeout(() => {
-          window.setTimeout(() => window.location.assign(destination), PAGE_WIPE_HOLD_MS);
-        }, PAGE_WIPE_CLOSE_MS);
-      });
-    });
-  }
 
   async function init() {
-    setupHomeWipeNavigation();
     byId('archive-year').textContent = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric' }).format(new Date());
     try {
       const [content, settings] = await Promise.all([json('content.json'), json('settings.json')]);
