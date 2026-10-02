@@ -589,63 +589,6 @@
     return `${Math.floor(count / 5) * 5}+`;
   }
 
-  function parseStatValue(value) {
-    const match = words(value).trim().match(/^(\d+(?:\.\d+)?)([KMB]?)(\+?)$/i);
-    if (!match) return null;
-    return {
-      number: Number(match[1]),
-      suffix: match[2].toUpperCase(),
-      plus: match[3],
-      decimals: (match[1].split('.')[1] || '').length
-    };
-  }
-
-  function animateStatValue(element, finalValue) {
-    const parsed = parseStatValue(finalValue);
-    if (!parsed || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      element.textContent = finalValue;
-      return;
-    }
-
-    const duration = 950;
-    const started = performance.now();
-    const frame = (now) => {
-      const progress = Math.min(1, (now - started) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const value = parsed.number * eased;
-      const display = parsed.decimals
-        ? value.toFixed(parsed.decimals)
-        : String(Math.round(value));
-      element.textContent = `${display}${parsed.suffix}${parsed.plus}`;
-      if (progress < 1) requestAnimationFrame(frame);
-      else element.textContent = finalValue;
-    };
-    requestAnimationFrame(frame);
-  }
-
-  function startStatsAnimation(host) {
-    if (!host || host.dataset.statsAnimated === 'true') return;
-    const run = () => {
-      if (host.dataset.statsAnimated === 'true') return;
-      host.dataset.statsAnimated = 'true';
-      host.querySelectorAll('.credibility-value[data-stat-target]').forEach((element) => {
-        animateStatValue(element, element.dataset.statTarget || element.textContent || '');
-      });
-    };
-
-    if (!('IntersectionObserver' in window)) {
-      run();
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      run();
-    }, { threshold: 0.35 });
-    observer.observe(host);
-  }
-
   function statParts(value) {
     const text = words(value).trim();
     const match = text.match(/^(\d+(?:[.,]\d+)?)(.*)$/);
