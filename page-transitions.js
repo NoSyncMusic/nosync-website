@@ -1,10 +1,9 @@
 (() => {
   'use strict';
 
-  const CLOSE_MS = 560;
   const HOLD_MS = 150;
-  const REVEAL_MS = 720;
-  const REVEAL_DELAY_MS = 180;
+  const CLOSE_FALLBACK_MS = 760;
+  const REVEAL_FALLBACK_MS = 1100;
   const body = document.body;
   if (!body) return;
 
@@ -31,11 +30,27 @@
   }
 
   function beginReveal() {
+    if (body.classList.contains('is-page-transition-ready')) return;
     if (reducedMotion()) {
       markReady();
       return;
     }
-    revealTimer = window.setTimeout(markReady, REVEAL_DELAY_MS + REVEAL_MS + 80);
+
+    let finished = false;
+    const complete = () => {
+      if (finished) return;
+      finished = true;
+      body.removeEventListener('animationend', onAnimationEnd);
+      markReady();
+    };
+    const onAnimationEnd = (event) => {
+      if (event.animationName !== 'page-curtain-reveal') return;
+      if (event.pseudoElement && event.pseudoElement !== '::before') return;
+      complete();
+    };
+
+    body.addEventListener('animationend', onAnimationEnd);
+    revealTimer = window.setTimeout(complete, REVEAL_FALLBACK_MS);
   }
 
   function isSameDocument(url) {
@@ -73,10 +88,24 @@
       return;
     }
 
-    body.classList.add('is-page-wiping');
-    window.setTimeout(() => {
+    let covered = false;
+    let fallbackTimer = 0;
+    const navigate = () => {
+      if (covered) return;
+      covered = true;
+      window.clearTimeout(fallbackTimer);
+      body.removeEventListener('transitionend', onTransitionEnd);
       window.setTimeout(() => window.location.assign(destination), HOLD_MS);
-    }, CLOSE_MS);
+    };
+    const onTransitionEnd = (event) => {
+      if (event.propertyName !== 'transform') return;
+      if (event.pseudoElement && event.pseudoElement !== '::before') return;
+      navigate();
+    };
+
+    body.addEventListener('transitionend', onTransitionEnd);
+    body.classList.add('is-page-wiping');
+    fallbackTimer = window.setTimeout(navigate, CLOSE_FALLBACK_MS);
   }
 
   document.addEventListener('click', (event) => {
