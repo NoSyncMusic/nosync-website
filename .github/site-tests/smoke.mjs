@@ -139,9 +139,21 @@ for (const config of matrix) {
       await page.waitForFunction(() => document.body.classList.contains('is-page-wiping'));
       assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('is-page-wiping')), true,
         'Homepage navigation wipe did not start');
+
+      await page.waitForTimeout(350);
+      assert.equal(new URL(page.url()).pathname, '/releases/',
+        'Homepage navigation happened too early; curtain should fully cover the page first');
+
       await page.waitForURL((url) => url.pathname === '/');
       assert.equal(await page.locator('body').evaluate((element) => element.classList.contains('home-page')), true,
         'Homepage did not load after wipe');
+
+      await page.waitForTimeout(1000);
+      const curtain = await page.locator('body').evaluate((element) => {
+        const style = getComputedStyle(element, '::before');
+        return { transform: style.transform, pointerEvents: style.pointerEvents };
+      });
+      assert.notEqual(curtain.transform, 'none', 'Homepage curtain did not render');
     }
 
     await page.goto(`${base}/presave/`, { waitUntil: 'domcontentloaded' });
