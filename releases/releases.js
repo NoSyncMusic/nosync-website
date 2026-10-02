@@ -459,6 +459,14 @@
     releaseViewAnimations = [];
   }
 
+  function finishReleaseViewTransition(host) {
+    cancelReleaseViewAnimations();
+    host.style.height = '';
+    host.style.overflow = '';
+    host.classList.remove('is-view-switching');
+    setReleaseViewControlsDisabled(false);
+  }
+
   function renderReleaseView(host, releases, settings, view, animate = false) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const newLayer = createReleaseViewLayer(releases, settings, view);
@@ -468,89 +476,64 @@
     updateViewControls(view);
 
     if (!animate || reduceMotion || !(oldLayer instanceof HTMLElement)) {
-      cancelReleaseViewAnimations();
+      finishReleaseViewTransition(host);
       host.replaceChildren(newLayer);
-      host.style.height = '';
-      host.style.overflow = '';
-      host.style.position = '';
-      host.classList.remove('is-view-switching');
-      setReleaseViewControlsDisabled(false);
       return;
     }
 
-    cancelReleaseViewAnimations();
+    finishReleaseViewTransition(host);
 
     const oldHeight = Math.max(1, host.getBoundingClientRect().height);
     host.classList.add('is-view-switching');
-    host.style.position = 'relative';
     host.style.height = `${oldHeight}px`;
     host.style.overflow = 'hidden';
-
-    oldLayer.classList.add('release-view-layer-old');
-    Object.assign(oldLayer.style, {
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      right: '0',
-      width: '100%'
-    });
-
-    newLayer.classList.add('release-view-layer-new');
-    Object.assign(newLayer.style, {
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      right: '0',
-      width: '100%',
-      visibility: 'hidden'
-    });
-    host.append(newLayer);
-
-    const newHeight = Math.max(1, newLayer.getBoundingClientRect().height);
-    newLayer.style.visibility = '';
     setReleaseViewControlsDisabled(true);
 
-    const heightAnimation = host.animate([
-      { height: `${oldHeight}px` },
-      { height: `${newHeight}px` }
+    const fadeOut = oldLayer.animate([
+      { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+      { opacity: 0, transform: 'translate3d(0, -4px, 0)' }
     ], {
-      duration: 520,
-      easing: 'cubic-bezier(.22, .72, .18, 1)',
+      duration: 130,
+      easing: 'ease-out',
       fill: 'forwards'
     });
+    releaseViewAnimations = [fadeOut];
 
-    const oldAnimation = oldLayer.animate([
-      { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
-      { opacity: 0, transform: 'translate3d(0, -6px, 0) scale(.996)' }
-    ], {
-      duration: 260,
-      easing: 'cubic-bezier(.4, 0, 1, 1)',
-      fill: 'forwards'
-    });
+    fadeOut.finished.then(() => {
+      if (!host.classList.contains('is-view-switching')) return;
 
-    const newAnimation = newLayer.animate([
-      { opacity: 0, transform: 'translate3d(0, 8px, 0) scale(.996)' },
-      { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' }
-    ], {
-      duration: 380,
-      delay: 90,
-      easing: 'cubic-bezier(.2, .8, .2, 1)',
-      fill: 'forwards'
-    });
-
-    releaseViewAnimations = [heightAnimation, oldAnimation, newAnimation];
-
-    heightAnimation.addEventListener('finish', () => {
-      cancelReleaseViewAnimations();
-      newLayer.removeAttribute('style');
-      newLayer.classList.remove('release-view-layer-new');
       host.replaceChildren(newLayer);
-      host.style.height = '';
-      host.style.overflow = '';
-      host.style.position = '';
-      host.classList.remove('is-view-switching');
-      setReleaseViewControlsDisabled(false);
-    }, { once: true });
+      newLayer.style.opacity = '0';
+      newLayer.style.transform = 'translate3d(0, 6px, 0)';
+
+      const newHeight = Math.max(1, newLayer.scrollHeight);
+      const heightAnimation = host.animate([
+        { height: `${oldHeight}px` },
+        { height: `${newHeight}px` }
+      ], {
+        duration: 360,
+        easing: 'cubic-bezier(.22, .72, .18, 1)',
+        fill: 'forwards'
+      });
+
+      const fadeIn = newLayer.animate([
+        { opacity: 0, transform: 'translate3d(0, 6px, 0)' },
+        { opacity: 1, transform: 'translate3d(0, 0, 0)' }
+      ], {
+        duration: 250,
+        delay: 55,
+        easing: 'cubic-bezier(.2, .8, .2, 1)',
+        fill: 'forwards'
+      });
+
+      releaseViewAnimations = [heightAnimation, fadeIn];
+
+      heightAnimation.finished.then(() => {
+        if (!host.classList.contains('is-view-switching')) return;
+        newLayer.removeAttribute('style');
+        finishReleaseViewTransition(host);
+      }).catch(() => {});
+    }).catch(() => {});
   }
 
   async function init() {
