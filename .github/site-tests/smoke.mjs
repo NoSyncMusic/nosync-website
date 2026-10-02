@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { chromium, firefox, webkit } from 'playwright';
+import AxeBuilder from '@axe-core/playwright';
 
 const base = 'http://127.0.0.1:4173';
 const matrix = [
@@ -36,6 +37,23 @@ async function waitForPageCurtain(page, label) {
   assert.equal(state.ready, true, `${label}: curtain did not finish revealing`);
   assert.equal(state.wiping, false, `${label}: page remained in outgoing transition state`);
   assert.equal(state.pointerEvents, 'none', `${label}: curtain still blocks page interaction`);
+}
+
+async function assertAccessible(page, label) {
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  const blocking = results.violations.filter((violation) =>
+    violation.impact === 'critical' || violation.impact === 'serious');
+  assert.deepEqual(
+    blocking.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      nodes: violation.nodes.map((node) => node.target)
+    })),
+    [],
+    `${label}: serious accessibility violations detected`
+  );
 }
 
 async function openAndCheckModal(page, trigger, label) {
@@ -104,6 +122,7 @@ for (const config of matrix) {
     await waitForPageCurtain(page, `${config.name} homepage`);
     await assertNoHorizontalOverflow(page, `${config.name} homepage`);
     if (config.name === 'Chromium desktop') {
+      await assertAccessible(page, 'Homepage');
       const stats = page.locator('#credibility-strip');
       await stats.scrollIntoViewIfNeeded();
       const initialStatValues = await page.locator('.credibility-value[data-stat-target]').allTextContents();
@@ -147,6 +166,7 @@ for (const config of matrix) {
       await waitForPageCurtain(page, `${config.name} releases`);
     }
     await assertNoHorizontalOverflow(page, `${config.name} releases`);
+    if (config.name === 'Chromium desktop') await assertAccessible(page, 'All Releases');
     assert.equal(await page.locator('#release-view-grid').getAttribute('aria-pressed'), 'true',
       `${config.name}: grid is not the default release view`);
 
@@ -197,6 +217,7 @@ for (const config of matrix) {
     await page.locator('#presave-status').waitFor();
     await waitForPageCurtain(page, `${config.name} presave`);
     await assertNoHorizontalOverflow(page, `${config.name} presave`);
+    if (config.name === 'Chromium desktop') await assertAccessible(page, 'Pre-save');
 
     if (config.name === 'Chromium desktop') {
       await page.goto(`${base}/under-construction/`, { waitUntil: 'domcontentloaded' });
