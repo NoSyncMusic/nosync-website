@@ -665,3 +665,40 @@ body.stream-modal-open { overflow: hidden; }
     animation: none;
   }
 }
+
+
+/* Progressive cross-page transition */
+@view-transition {
+  navigation: auto;
+}
+@keyframes page-leave {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0);
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+}
+::view-transition-old(root) {
+  animation: page-leave .16s ease-out both;
+}
+::view-transition-new(root) {
+  animation: page-enter .32s cubic-bezier(.2, .8, .2, 1) both;
+}
+@supports (view-transition-name: none) {
+  .home-page .site-header,
+  .home-page #main-content,
+  .home-page .site-footer {
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
