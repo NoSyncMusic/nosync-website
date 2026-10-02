@@ -44,6 +44,7 @@
       markReady();
     };
     const onAnimationEnd = (event) => {
+      if (event.target !== body) return;
       if (event.animationName !== 'page-curtain-reveal') return;
       if (event.pseudoElement && event.pseudoElement !== '::before') return;
       complete();
@@ -98,6 +99,7 @@
       window.setTimeout(() => window.location.assign(destination), HOLD_MS);
     };
     const onTransitionEnd = (event) => {
+      if (event.target !== body) return;
       if (event.propertyName !== 'transform') return;
       if (event.pseudoElement && event.pseudoElement !== '::before') return;
       navigate();
