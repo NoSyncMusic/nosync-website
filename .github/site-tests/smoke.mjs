@@ -106,7 +106,16 @@ for (const config of matrix) {
     if (config.name === 'Chromium desktop') {
       const stats = page.locator('#credibility-strip');
       await stats.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(1100);
+      const initialStatValues = await page.locator('.credibility-value[data-stat-target]').allTextContents();
+      assert.ok(initialStatValues.some((value) => /^0/.test(value)),
+        `Homepage statistics should begin from zero after the curtain reveal: ${JSON.stringify(initialStatValues)}`);
+
+      await page.waitForFunction(() => {
+        const values = [...document.querySelectorAll('.credibility-value[data-stat-target]')];
+        return values.length === 3 && values.every((element) =>
+          element.textContent === element.dataset.statTarget);
+      }, null, { timeout: 5000 });
+
       const statValues = await page.locator('.credibility-value[data-stat-target]').evaluateAll((elements) =>
         elements.map((element) => ({ text: element.textContent, target: element.dataset.statTarget }))
       );
