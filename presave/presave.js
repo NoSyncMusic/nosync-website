@@ -1,8 +1,16 @@
 (() => {
   'use strict';
 
-  const byId = (id) => document.getElementById(id);
-  const words = (value, fallback = '') => typeof value === 'string' ? value : fallback;
+  const {
+    byId,
+    words,
+    webUrl,
+    todayInAmsterdam,
+    validDate,
+    hex,
+    contrast,
+    readableAccent
+  } = window.NoSyncCore;
   const serviceNames = {
     SPOTIFY: 'Spotify',
     APPLE_MUSIC: 'Apple Music',
@@ -25,14 +33,6 @@
 
   const root = siteRoot();
 
-  const webUrl = (value) => {
-    if (typeof value !== 'string') return '';
-    try {
-      const url = new URL(value);
-      return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
-    } catch { return ''; }
-  };
-
   const imageUrl = (value) => {
     if (typeof value !== 'string' || !value.trim()) return '';
     try {
@@ -44,18 +44,6 @@
   };
 
   const slugify = (value) => words(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-  function todayInAmsterdam() {
-    const parts = new Intl.DateTimeFormat('en', { timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
-    const get = (type) => parts.find((part) => part.type === type)?.value || '';
-    return `${get('year')}-${get('month')}-${get('day')}`;
-  }
-
-  function validDate(value) {
-    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-    const date = new Date(`${value}T12:00:00Z`);
-    return Number.isFinite(date.getTime()) ? date : null;
-  }
 
   function amsterdamMidnightMs(value) {
     const date = validDate(value);
@@ -131,33 +119,6 @@
     return response.json();
   }
 
-  function hex(value) {
-    const match = words(value).trim().match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
-    if (!match) return '';
-    const digits = match[1].length === 3 ? [...match[1]].map((x) => x + x).join('') : match[1];
-    return `#${digits.toUpperCase()}`;
-  }
-  function channels(color) { return [1, 3, 5].map((start) => parseInt(color.slice(start, start + 2), 16)); }
-  function luminance(color) {
-    const rgb = channels(color).map((v) => { const s = v / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; });
-    return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
-  }
-  function contrast(a, b) { const x = luminance(a); const y = luminance(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
-  function blend(color, target, amount) {
-    return '#' + channels(color).map((value, i) => Math.round(value + (channels(target)[i] - value) * amount).toString(16).padStart(2, '0')).join('');
-  }
-  function readableAccent(color, background, surface) {
-    const score = (candidate) => Math.min(contrast(candidate, background), contrast(candidate, surface));
-    let best = color;
-    for (let step = 0; step <= 40; step++) {
-      for (const target of ['#FFFFFF', '#000000']) {
-        const candidate = blend(color, target, step / 40);
-        if (score(candidate) >= 4.5) return candidate;
-        if (score(candidate) > score(best)) best = candidate;
-      }
-    }
-    return best;
-  }
   function applyColors(settings) {
     const fallback = {
       accent: '#D94A4A', background: '#101010', text: '#E5E5E5', headings: '#F5F5F5',
