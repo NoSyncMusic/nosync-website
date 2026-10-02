@@ -7,7 +7,7 @@ Deze repository gebruikt twee gescheiden omgevingen:
 
 Normale wijzigingen worden via Pages CMS naar GitHub geschreven en verschijnen automatisch op de GitHub Pages-preview.
 
-De productieversie verandert **alleen** wanneer in Pages CMS op **Publiceer naar Namecheap** wordt gedrukt.
+De productieversie verandert alleen via de beveiligde GitHub Actions-workflow **Publish to Namecheap**. Normaal start Pages CMS deze workflow; GitHub Actions biedt daarnaast een handmatige fallback als Pages CMS niet beschikbaar is.
 
 ## Eenmalige Namecheap-inrichting
 
@@ -53,16 +53,26 @@ Zet deze gegevens **nooit** in `content.json`, `.pages.yml`, README-bestanden of
 
 ## Publiceren
 
+### Normaal via Pages CMS
+
 1. Pas de website aan in Pages CMS.
 2. Sla de wijziging op.
 3. Open de GitHub Pages-preview en controleer de website.
-4. Ga terug naar Pages CMS.
-5. Klik **Publiceer naar Namecheap**.
-6. Bevestig **Publiceer**.
+4. Wacht tot de Pages-build en Site browser smoke tests groen zijn.
+5. Ga terug naar Pages CMS.
+6. Klik **Publiceer naar Namecheap** en bevestig.
 
-Pages CMS stuurt de exacte Git commit-SHA naar GitHub Actions. De deployment checkt vervolgens precies die geteste commit uit en uploadt die naar Namecheap.
+### Handmatige fallback als Pages CMS niet beschikbaar is
 
-Hierdoor kan een nieuwere, nog niet gecontroleerde wijziging niet per ongeluk worden meegenomen.
+1. Open GitHub → Actions → **Publish to Namecheap**.
+2. Kies **Run workflow**.
+3. Laat `payload` leeg.
+4. Vul bij `commit_sha` het volledige 40-teken SHA van de gecontroleerde commit in.
+5. Start de workflow.
+
+De workflow weigert een commit die niet op `main` staat of geen groene GitHub Pages-build én groene browser-smoketest heeft.
+
+Na de upload worden productie-URLs gecontroleerd en worden `page-transitions.js` en `content.json` byte-voor-byte met de geselecteerde commit vergeleken.
 
 ## Wat wordt niet gepubliceerd?
 
@@ -91,3 +101,12 @@ De productie-workflow staat in:
 De Pages CMS-knop staat in:
 
 `.pages.yml`
+
+
+## Rollback
+
+Een rollback gebruikt dezelfde handmatige GitHub Actions-route. Vul het SHA in van een **eerder getest commit** dat nog onderdeel is van `main`. Dezelfde test-gates en productie-verificatie blijven gelden.
+
+## Gegenereerde pre-savepagina's
+
+De hoofddeploy verwijdert bewust geen onbekende bestanden uit de volledige hostingroot. Alleen de door deze website beheerde map `/presave/` wordt exact gesynchroniseerd, inclusief het gecontroleerd verwijderen van verouderde gegenereerde pagina's.
