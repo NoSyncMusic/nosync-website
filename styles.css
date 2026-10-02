@@ -529,7 +529,6 @@ body.stream-modal-open { overflow: hidden; }
 .all-releases-list { transform-origin: top center; }
 .all-releases-list.is-view-switching {
   will-change: height;
-  contain: layout paint;
 }
 .release-view-layer {
   width: 100%;
