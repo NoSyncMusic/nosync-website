@@ -168,8 +168,11 @@ for (const config of matrix) {
   });
   page.on('requestfailed', request => {
     const url = request.url();
-    if (url.startsWith(base)) {
-      failedRequests.push(`${request.method()} ${url}: ${request.failure()?.errorText || 'failed'}`);
+    const reason = request.failure()?.errorText || 'failed';
+    // Chromium aborts in-flight assets when the test deliberately navigates/reloads.
+    // Those are not network failures; actual HTTP errors are captured via response().
+    if (url.startsWith(base) && reason !== 'net::ERR_ABORTED') {
+      failedRequests.push(`${request.method()} ${url}: ${reason}`);
     }
   });
   page.on('response', response => {
