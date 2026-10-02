@@ -2,7 +2,8 @@
   'use strict';
 
   const byId = (id) => document.getElementById(id);
-  const PAGE_WIPE_MS = 480;
+  const PAGE_WIPE_CLOSE_MS = 560;
+  const PAGE_WIPE_HOLD_MS = 150;
   const words = (value, fallback = '') => typeof value === 'string' ? value : fallback;
   const serviceNames = {
     SPOTIFY: 'Spotify',
@@ -208,11 +209,27 @@
     byId('presave-services-wrap').hidden = !services.length;
   }
 
+  function resetPageWipe() {
+    document.body.classList.add('is-page-wipe-reset');
+    document.body.classList.remove('is-page-wiping');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.body.classList.remove('is-page-wipe-reset');
+    }));
+  }
+
   function setupHomeWipeNavigation() {
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted || document.body.classList.contains('is-page-wiping')) resetPageWipe();
+    });
+
     document.querySelectorAll('#presave-back').forEach((link) => {
       link.addEventListener('click', (event) => {
         if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         if (link.target === '_blank' || link.hasAttribute('download')) return;
+        if (document.body.classList.contains('is-page-wiping')) {
+          event.preventDefault();
+          return;
+        }
 
         const destination = link.href;
         if (!destination) return;
@@ -224,7 +241,9 @@
         }
 
         document.body.classList.add('is-page-wiping');
-        window.setTimeout(() => window.location.assign(destination), PAGE_WIPE_MS);
+        window.setTimeout(() => {
+          window.setTimeout(() => window.location.assign(destination), PAGE_WIPE_HOLD_MS);
+        }, PAGE_WIPE_CLOSE_MS);
       });
     });
   }
