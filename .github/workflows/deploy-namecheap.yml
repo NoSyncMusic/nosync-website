@@ -183,17 +183,7 @@ jobs:
             set ssl:verify-certificate true;
             set net:max-retries 2;
             set net:timeout 30;
-            mirror --reverse --verbose --parallel=2 \
-              --exclude-glob .git/** \
-              --exclude-glob .github/** \
-              --exclude-glob .pages.yml \
-              --exclude-glob README.md \
-              --exclude-glob CMS-GUIDE.md \
-              --exclude-glob NAMECHEAP-DEPLOY.md \
-              --exclude-glob package.json \
-              --exclude-glob package-lock.json \
-              --exclude-glob scripts/** \
-              ./ /;
+            mirror --reverse --verbose --parallel=2 --exclude-glob .git/** --exclude-glob .github/** --exclude-glob .pages.yml --exclude-glob README.md --exclude-glob CMS-GUIDE.md --exclude-glob NAMECHEAP-DEPLOY.md --exclude-glob package.json --exclude-glob package-lock.json --exclude-glob scripts/** ./ /;
             mirror --reverse --delete --verbose --parallel=2 presave/ /presave/;
             bye
           '
