@@ -221,6 +221,9 @@
     links.forEach((link) => {
       const label = platformLabel(link);
       const service = externalLink(link.url, 'stream-service', `${title} — ${label}`);
+      service.dataset.nosyncPlatform = words(link.type, label).toLowerCase();
+      service.dataset.nosyncReleaseTitle = title;
+      service.dataset.nosyncReleaseIsrc = words(release.isrc);
       service.append(node('span', 'stream-service-name', label), node('span', 'stream-service-action', words(settings?.music?.openPlatformLabel, 'Open ↗')));
       services.append(service);
     });
