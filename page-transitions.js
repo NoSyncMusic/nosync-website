@@ -134,3 +134,14 @@
   if (document.readyState === 'complete') beginReveal();
   else window.addEventListener('load', beginReveal, { once: true });
 })();
+
+
+/* No Sync first-party analytics */
+(() => {
+  if (document.querySelector('script[data-nosync-analytics]')) return;
+  const script = document.createElement('script');
+  script.src = 'https://portal.nosyncmusic.com/analytics.js';
+  script.defer = true;
+  script.dataset.nosyncAnalytics = 'true';
+  document.head.appendChild(script);
+})();
