@@ -1,6 +1,9 @@
 name: Publish to Namecheap
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       payload:
@@ -23,6 +26,7 @@ concurrency:
 jobs:
   publish:
     name: Publish tested commit
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Publish Career Control Center website updates'
     runs-on: ubuntu-latest
     environment: production
 
@@ -42,11 +46,15 @@ jobs:
           payload_raw = os.environ.get("PAGES_PAYLOAD", "").strip()
           manual_sha = os.environ.get("MANUAL_SHA", "").strip()
           expected = os.environ["EXPECTED_REPOSITORY"]
+          event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+          event_sha = os.environ.get("GITHUB_SHA", "").strip()
 
-          if bool(payload_raw) == bool(manual_sha):
+          if event_name == "push":
+              sha = event_sha
+              trigger = "Career Control Center rollout"
+          elif bool(payload_raw) == bool(manual_sha):
               raise SystemExit("Provide exactly one source: Pages CMS payload or manual commit SHA.")
-
-          if payload_raw:
+          elif payload_raw:
               payload = json.loads(payload_raw)
               repository = payload.get("repository") or {}
               owner = repository.get("owner", "")
@@ -58,7 +66,7 @@ jobs:
               if actual.lower() != expected.lower():
                   raise SystemExit(f"Repository mismatch: {actual} != {expected}")
               trigger = "Pages CMS"
-          else:
+          elif event_name != "push":
               sha = manual_sha
               trigger = "Manual GitHub fallback"
 
