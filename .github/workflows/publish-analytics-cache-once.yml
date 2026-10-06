@@ -13,8 +13,10 @@ jobs:
     if: github.event.head_commit.message == 'Publish analytics cache refresh to Namecheap'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Validate secrets
         env:
           FTP_HOST: ${{ secrets.NAMECHEAP_FTP_HOST }}
@@ -24,10 +26,12 @@ jobs:
           test -n "$FTP_HOST"
           test -n "$FTP_USER"
           test -n "$FTP_PASSWORD"
+
       - name: Install FTPS client
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lftp
+
       - name: Publish analytics files
         env:
           FTP_HOST: ${{ secrets.NAMECHEAP_FTP_HOST }}
@@ -51,9 +55,14 @@ jobs:
             put -O /under-construction under-construction/index.html;
             bye
           '
+
       - name: Verify production
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --location --retry 5 --retry-delay 2             "https://nosyncmusic.com/?verify=${{ github.run_id }}" | grep -q "page-transitions.js?v=20261006-analytics1"
-          curl --fail --silent --show-error --location --retry 5 --retry-delay 2             "https://nosyncmusic.com/page-transitions.js?verify=${{ github.run_id }}" | grep -q "portal.nosyncmusic.com/analytics.js"
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2             "https://nosyncmusic.com/?verify=${{ github.run_id }}"             -o /tmp/home.html
+          grep -q "page-transitions.js?v=20261006-analytics1" /tmp/home.html
+
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2             "https://nosyncmusic.com/page-transitions.js?verify=${{ github.run_id }}"             -o /tmp/transitions.js
+          grep -q "portal.nosyncmusic.com/analytics.js" /tmp/transitions.js
+
           echo "Analytics cache refresh verified on production"
