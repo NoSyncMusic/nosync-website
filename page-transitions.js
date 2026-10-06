@@ -140,7 +140,7 @@
 (() => {
   if (document.querySelector('script[data-nosync-analytics]')) return;
   const script = document.createElement('script');
-  script.src = 'https://portal.nosyncmusic.com/analytics.js?v=3.0';
+  script.src = 'https://portal.nosyncmusic.com/analytics.js?v=3.1';
   script.defer = true;
   script.dataset.nosyncAnalytics = 'true';
   document.head.appendChild(script);
