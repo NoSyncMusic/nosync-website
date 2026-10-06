@@ -1,0 +1,59 @@
+name: Publish analytics cache refresh once
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.event.head_commit.message == 'Publish analytics cache refresh to Namecheap'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate secrets
+        env:
+          FTP_HOST: ${{ secrets.NAMECHEAP_FTP_HOST }}
+          FTP_USER: ${{ secrets.NAMECHEAP_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
+        run: |
+          test -n "$FTP_HOST"
+          test -n "$FTP_USER"
+          test -n "$FTP_PASSWORD"
+      - name: Install FTPS client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+      - name: Publish analytics files
+        env:
+          FTP_HOST: ${{ secrets.NAMECHEAP_FTP_HOST }}
+          FTP_USER: ${{ secrets.NAMECHEAP_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
+        run: |
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "ftp://$FTP_HOST:21" -e '
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 30;
+            put -O / page-transitions.js;
+            put -O / index.html;
+            put -O / 404.html;
+            put -O / presave-demo.html;
+            put -O /presave presave/index.html;
+            put -O /presave/demo presave/demo/index.html;
+            put -O /releases releases/index.html;
+            put -O /under-construction under-construction/index.html;
+            bye
+          '
+      - name: Verify production
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2             "https://nosyncmusic.com/?verify=${{ github.run_id }}" | grep -q "page-transitions.js?v=20261006-analytics1"
+          curl --fail --silent --show-error --location --retry 5 --retry-delay 2             "https://nosyncmusic.com/page-transitions.js?verify=${{ github.run_id }}" | grep -q "portal.nosyncmusic.com/analytics.js"
+          echo "Analytics cache refresh verified on production"
